@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient  {
 
-    public static final String BASE_URL = "http://codeart-thinker.herokuapp.com/restapi/";
+    public static final String BASE_URL = "http://thinker-codeart.44fs.preview.openshiftapps.com/restapi/";
     private static Retrofit retrofit = null;
 
 

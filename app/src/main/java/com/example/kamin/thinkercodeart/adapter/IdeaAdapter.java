@@ -40,7 +40,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
         TextView tags;
         public IdeaViewHolder(View itemView) {
             super(itemView);
-            ideaLayout = (LinearLayout) itemView.findViewById(R.id.ideaLayout);
+            //ideaLayout = (LinearLayout) itemView.findViewById(R.id.ideaLayout);
             thumbnail = (ImageView) itemView.findViewById(R.id.thumbnail);
             nameIdea = (TextView) itemView.findViewById(R.id.nameIdea);
             //bodyIdea = (TextView) itemView.findViewById(R.id.bodyIdea);
