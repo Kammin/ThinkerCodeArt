@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.kamin.thinkercodeart.R;
@@ -15,9 +14,6 @@ import com.example.kamin.thinkercodeart.model.Idea;
 
 import java.util.List;
 
-/**
- * Created by Kamin on 03.12.2016.
- */
 
 public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder> {
     private List<Idea> ideas;
@@ -31,7 +27,6 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
     }
 
     public class IdeaViewHolder extends RecyclerView.ViewHolder {
-        LinearLayout ideaLayout;
         ImageView thumbnail;
         TextView nameIdea;
         TextView bodyIdea;
@@ -40,10 +35,9 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
         TextView tags;
         public IdeaViewHolder(View itemView) {
             super(itemView);
-            //ideaLayout = (LinearLayout) itemView.findViewById(R.id.ideaLayout);
             thumbnail = (ImageView) itemView.findViewById(R.id.thumbnail);
             nameIdea = (TextView) itemView.findViewById(R.id.nameIdea);
-            //bodyIdea = (TextView) itemView.findViewById(R.id.bodyIdea);
+            bodyIdea = (TextView) itemView.findViewById(R.id.bodyIdea);
             author = (TextView) itemView.findViewById(R.id.author);
             date = (TextView) itemView.findViewById(R.id.date);
             tags = (TextView) itemView.findViewById(R.id.tags);
@@ -60,7 +54,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
     @Override
     public void onBindViewHolder(IdeaAdapter.IdeaViewHolder holder, int position) {
         holder.nameIdea.setText(ideas.get(position).getName());
-      //  holder.bodyIdea.setText(ideas.get(position).getBodyIdea());
+        holder.bodyIdea.setText(ideas.get(position).getBodyIdea());
         holder.author.setText(ideas.get(position).getAuthor().getUsername());
         holder.date.setText(DateFormat.format("dd.MM.yyyy", ideas.get(position).getDate()).toString());
         holder.tags.setText(ideas.get(position).getTags().toString());

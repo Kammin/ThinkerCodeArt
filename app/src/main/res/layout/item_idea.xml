@@ -13,61 +13,151 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@color/colorBackCard">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/colorCard">
+
+            <ImageView
+                android:id="@+id/avatar"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_gravity="top"
+                android:scaleType="centerCrop"
+                android:src="@mipmap/empty_avatar" />
+
+
+                <TextView
+                    android:id="@+id/author"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:layout_weight="0.5"
+                    android:layout_gravity="start|center_vertical"
+                    android:gravity="center_vertical"
+                    android:text="Author Author"
+                    android:textSize="@dimen/textSize_author"
+                    android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_gravity="end"
+                android:text="07.12.2016"
+                android:textSize="@dimen/textSize_date" />
+
+
+        </LinearLayout>
+
 
         <TextView
             android:id="@+id/nameIdea"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="@dimen/default_margin"
+            android:layout_marginRight="@dimen/default_margin"
+            android:layout_marginBottom="@dimen/default_margin"
             android:gravity="center_horizontal"
+            android:text="Андрей, работай с трелло, чтобы всем было видно на каком ты этапе"
             android:textSize="@dimen/textSize_nameIdea"
             android:textStyle="bold" />
 
-
         <TextView
-            android:id="@+id/author"
-            android:layout_width="wrap_content"
+            android:id="@+id/bodyIdea"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/textSize_author" />
+            android:layout_marginLeft="@dimen/default_margin"
+            android:layout_marginRight="@dimen/default_margin"
+            android:layout_marginBottom="@dimen/default_margin"
+            android:text="Андрей, работай с трелло, чтобы всем было видно на каком ты этапе. Андрей, работай с трелло, чтобы всем было видно на каком ты этапе. Андрей, работай с трелло, чтобы всем было видно на каком ты этапе. Андрей, работай с трелло, чтобы всем было видно на каком ты этапе. Андрей, работай с трелло, чтобы всем было видно на каком ты этапе. Андрей, работай с трелло, чтобы всем было видно на каком ты этапе. Андрей, работай с трелло, чтобы всем было видно на каком ты этапе. Андрей, работай с трелло, чтобы всем было видно на каком ты этапе." />
 
 
-        <TextView
-            android:id="@+id/date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+        <ImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_gravity="center_vertical"
+            android:scaleType="centerInside"
+            android:src="@mipmap/muz" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="start"
             android:orientation="horizontal">
 
+            <HorizontalScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/tags"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/default_margin"
+                        android:layout_marginRight="@dimen/default_margin"
+
+                        android:gravity="start"
+                        android:text="#Андрей #работа #трелло"
+                        android:textColor="@color/colorHashTag" />
+
+                </LinearLayout>
+            </HorizontalScrollView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="end"
+            android:orientation="horizontal"
+            android:background="@color/colorCard">
 
             <ImageView
-                android:id="@+id/thumbnail"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:id="@+id/like"
+                android:layout_width="@dimen/LikeSize"
+                android:layout_height="@dimen/LikeSize"
+                android:layout_gravity="end|center_vertical"
+                android:scaleType="centerInside"
+                android:src="@mipmap/like" />
+
+            <TextView
+                android:id="@+id/likeCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:src="@mipmap/empty" />
+                android:layout_margin="@dimen/default_margin"
+                android:text="5" />
 
+            <ImageView
+                android:id="@+id/dislike"
+                android:layout_width="@dimen/LikeSize"
+                android:layout_height="@dimen/LikeSize"
+                android:layout_gravity="end|center_vertical"
+                android:scaleType="centerInside"
+                android:src="@mipmap/dislike" />
 
+            <TextView
+                android:id="@+id/dislikeCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="@dimen/default_margin"
+                android:gravity="start"
+                android:text="3" />
 
         </LinearLayout>
 
-        <!--    <TextView
-                android:id="@+id/bodyIdea"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="0dp" />-->
 
-        <TextView
-            android:id="@+id/tags"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="0dp"
-            android:gravity="end" />
     </LinearLayout>
 
 </android.support.v7.widget.CardView>
