@@ -6,58 +6,45 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import com.android.volley.Cache;
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.example.kamin.thinkercodeart.R;
-import com.example.kamin.thinkercodeart.adapter.IdeaAdapter;
 import com.example.kamin.thinkercodeart.model.Idea;
-import com.example.kamin.thinkercodeart.rest.ApiClient;
-import com.example.kamin.thinkercodeart.rest.ApiInterface;
+import com.example.kamin.thinkercodeart.volley.Singleton;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     List<Idea> ideas;
+    public static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.movies_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        String URL_FEED = "http://thinker-codeart.44fs.preview.openshiftapps.com/restapi/ideas";
 
-        ApiInterface apiService =
+/*        ApiInterface apiService =
                 ApiClient.getClient().create(ApiInterface.class);
 
         Call<List<Idea>> call = apiService.getIdeas();
+
         call.enqueue(new Callback<List<Idea>>() {
             @Override
             public void onResponse(Call<List<Idea>> call, Response<List<Idea>> response) {
                 int statusCode = response.code();
                 Log.d("IDEAS","OK"+response.body().size());
                 ideas = response.body();
-/*                for(int i = 0; i<response.body().size(); i++){
-                    Idea idea = response.body().get(i);
-                    Author author = idea.getAuthor();
-                    Date date = new Date(Long.valueOf(idea.getIdeaId().substring(0, 8 ), 16) * 1000);
-                    Log.d("IDEAS","  ");
-                    Log.d("IDEAS","Id "+idea.getIdeaId());
-                    Log.d("IDEAS","Name "+idea.getName());
-                    Log.d("IDEAS","Date "+date);
-                    Log.d("IDEAS","Desc "+idea.getBodyIdea());
-                    if(author!=null) {
-                        Log.d("IDEAS", "      AuthorId " + author.getUserId());
-                        Log.d("IDEAS", "      AuthorUsername " + author.getUsername());
-                        Log.d("IDEAS", "      AuthorEmail " + author.getEmail());
-                        Log.d("IDEAS", "      AuthorEnabled " + author.getEnabled());
-                        Log.d("IDEAS", "      AuthorId " + author.getRoles().toString());
-                    }
-                    Log.d("IDEAS","Files "+idea.getFiles().toString());
-                    Log.d("IDEAS","Tags "+idea.getTags().toString());
-                }*/
                 recyclerView.setAdapter(new IdeaAdapter(ideas, R.layout.item_idea, getApplicationContext()));
             }
 
@@ -67,45 +54,88 @@ public class MainActivity extends AppCompatActivity {
                 // Log error here since request failed
                 Log.e("", t.toString());
             }
-        });
-
-
-
-
-
-
-/*        Call<List<Idea>> call = apiService.getIdeas();
-        call.enqueue(new Callback<List<Idea>>() {
-            @Override
-            public void onResponse(Call<List<Idea>> call, Response<List<Idea>> response) {
-                Log.d("IDEAS","OK"+response.body().size());
-                for(int i = 0; i<response.body().size(); i++){
-                    Idea idea = response.body().get(i);
-                    Author author = idea.getAuthor();
-                    Date date = new Date(Long.valueOf(idea.getIdeaId().substring(0, 8 ), 16) * 1000);
-                    Log.d("IDEAS","  ");
-                    Log.d("IDEAS","Id "+idea.getIdeaId());
-                    Log.d("IDEAS","Name "+idea.getName());
-                    Log.d("IDEAS","Date "+date);
-                    Log.d("IDEAS","Desc "+idea.getBodyIdea());
-                    if(author!=null) {
-                        Log.d("IDEAS", "      AuthorId " + author.getUserId());
-                        Log.d("IDEAS", "      AuthorUsername " + author.getUsername());
-                        Log.d("IDEAS", "      AuthorEmail " + author.getEmail());
-                        Log.d("IDEAS", "      AuthorEnabled " + author.getEnabled());
-                        Log.d("IDEAS", "      AuthorId " + author.getRoles().toString());
-                    }
-                    Log.d("IDEAS","Files "+idea.getFiles().toString());
-                    Log.d("IDEAS","Tags "+idea.getTags().toString());
-                }
-                Log.d("IDEAS","--------------------------------");
-            }
-
-            @Override
-            public void onFailure(Call<List<Idea>> call, Throwable t) {
-                Log.d("IDEAS","NOT");
-            }
         });*/
 
+        Cache cache = Singleton.getInstance(this).getRequestQueue().getCache();
+        Cache.Entry entry = cache.get(URL_FEED);
+        if (entry != null) {
+            // fetch the data from cache
+            try {
+                String data = new String(entry.data, "UTF-8");
+                try {
+                    parseJsonFeed(new JSONObject(data));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            // making fresh volley request and getting json
+            JsonArrayRequest jsonReq = new JsonArrayRequest(Request.Method.GET,
+                    URL_FEED, null, new com.android.volley.Response.Listener<JSONArray>() {
+
+                @Override
+                public void onResponse(JSONArray response) {
+                    VolleyLog.d(TAG, "Response: " + response.toString());
+                    if (response != null) {
+                        Log.d(TAG," "+response.length());
+                        //parseJsonFeed(response);
+                    }
+                }
+            }, new com.android.volley.Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    VolleyLog.d(TAG, "Error: " + error.getMessage());
+                }
+            });
+
+            // Adding request to volley request queue
+            Singleton.getInstance(this).addToRequestQueue(jsonReq);
+        }
+
     }
+
+    /**
+     * Parsing json reponse and passing the data to feed view list adapter
+     * */
+    private void parseJsonFeed(JSONObject response) {
+        try {
+            JSONArray feedArray = response.getJSONArray("feed");
+
+/*            for (int i = 0; i < feedArray.length(); i++) {
+                JSONObject feedObj = (JSONObject) feedArray.get(i);
+
+                FeedItem item = new FeedItem();
+                item.setId(feedObj.getInt("id"));
+                item.setName(feedObj.getString("name"));
+
+                // Image might be null sometimes
+                String image = feedObj.isNull("image") ? null : feedObj
+                        .getString("image");
+                item.setImge(image);
+                item.setStatus(feedObj.getString("status"));
+                item.setProfilePic(feedObj.getString("profilePic"));
+                item.setTimeStamp(feedObj.getString("timeStamp"));
+
+                // url might be null sometimes
+                String feedUrl = feedObj.isNull("url") ? null : feedObj
+                        .getString("url");
+                item.setUrl(feedUrl);
+
+                feedItems.add(item);
+            }
+
+            // notify data changes to list adapater
+            listAdapter.notifyDataSetChanged();*/
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
 }
