@@ -1,6 +1,5 @@
 package com.example.kamin.thinkercodeart.activity;
 
-import android.graphics.Movie;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,6 +12,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.example.kamin.thinkercodeart.R;
+import com.example.kamin.thinkercodeart.adapter.IdeaAdapter;
 import com.example.kamin.thinkercodeart.model.Author;
 import com.example.kamin.thinkercodeart.model.Idea;
 import com.example.kamin.thinkercodeart.volley.Singleton;
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 String data = new String(entry.data, "UTF-8");
                 try {
-                    parseJsonFeed(new JSONObject(data));
+                    parseJsonFeed(new JSONArray(data));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -83,8 +83,11 @@ public class MainActivity extends AppCompatActivity {
                 public void onResponse(JSONArray response) {
                     VolleyLog.d(TAG, "Response: " + response.toString());
                     if (response != null) {
-                        Log.d(TAG," "+response.length());
+                        Log.d(TAG, "response length = " + response.length());
+                        ideas = new ArrayList<>();
                         parseJsonFeed(response);
+                        Log.d(TAG, "ideas length = " + ideas.size());
+                        recyclerView.setAdapter(new IdeaAdapter(ideas, R.layout.item_idea, getApplicationContext()));
                     }
                 }
             }, new com.android.volley.Response.ErrorListener() {
@@ -103,41 +106,48 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Parsing json reponse and passing the data to feed view list adapter
-     * */
+     */
     private void parseJsonFeed(JSONArray response) {
-        try {
 
-            for (int i = 0; i < response.length(); i++) {
-                try {
-                    JSONObject obj = response.getJSONObject(i);
-                    Idea idea = new Idea();
-                    idea.setIdeaId(obj.getString("ideaId"));
-                    idea.setName(obj.getString("name"));
-                    idea.setBodyIdea(obj.getString("description"));
-                    Author author = new Author();
-                    JSONObject objAuthor = obj.getJSONObject("author");
-                    author.setUserId(objAuthor.getString("userId"));
-                    author.setEmail(objAuthor.getString("email"));
-                    author.setUsername(objAuthor.getString("username"));
-                    JSONArray objFiles = obj.getJSONArray("files");
-                    List<String> filed = new ArrayList<String>();
-                    idea.setauthor(obj.getJSONObject("releaseYear"));
+        for (int i = 0; i < response.length(); i++) {
+            try {
+                JSONObject obj = response.getJSONObject(i);
+                Idea idea = new Idea();
+                idea.setIdeaId(obj.getString("ideaId"));
+                idea.setName(obj.getString("name"));
+                idea.setBodyIdea(obj.getString("description"));
 
-                    JSONArray genreArry = obj.getJSONArray("genre");
-                    ArrayList<String> genre = new ArrayList<String>();
-                    for (int j = 0; j < genreArry.length(); j++) {
-                        genre.add((String) genreArry.get(j));
-                    }
-                    idea.setGenre(genre);
+                Author author = new Author();
+                JSONObject objAuthor = obj.getJSONObject("author");
+                author.setUserId(objAuthor.getString("userId"));
+                author.setEmail(objAuthor.getString("email"));
+                author.setUsername(objAuthor.getString("username"));
+                idea.setAuthor(author);
 
-                    // adding movie to movies array
-                    movieList.add(movie);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                JSONArray objFiles = obj.getJSONArray("files");
+                List<String> files = new ArrayList<>();
+                for (int j = 0; j < objFiles.length(); j++) {
+                    String file = objFiles.get(j).toString();
+                    files.add(file);
                 }
+                idea.setFiles(files);
 
+                JSONArray objTags = obj.getJSONArray("tags");
+                List<String> tags = new ArrayList<>();
+                for (int k = 0; k < objFiles.length(); k++) {
+                    String tag = objFiles.get(k).toString();
+                    files.add(tag);
+                }
+                idea.setFiles(tags);
+                Log.d(TAG, " " + i + " " + idea.getBodyIdea());
+                ideas.add(idea);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
+
+        }
+
 /*            for (int i = 0; i < feedArray.length(); i++) {
                 JSONObject feedObj = (JSONObject) feedArray.get(i);
 
@@ -163,12 +173,7 @@ public class MainActivity extends AppCompatActivity {
 
             // notify data changes to list adapater
             listAdapter.notifyDataSetChanged();*/
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+
+
     }
-
-
-
-
 }

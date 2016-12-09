@@ -24,8 +24,8 @@ public class Idea {
     public void setName(String name){
         this.name= name;
     }
-    public void getBodyIdea(){
-        this.BodyIdea = BodyIdea;
+    public String getBodyIdea(){
+        return BodyIdea;
     }
     public void setBodyIdea(String BodyIdea){
         this.BodyIdea= BodyIdea;
@@ -39,13 +39,13 @@ public class Idea {
     public List<String> getFiles(){
         return files;
     }
-    public void seFiles(List<String> files){
+    public void setFiles(List<String> files){
         this.files= files;
     }
     public List<String> getTags(){
         return tags;
     }
-    public void seTags(List<String> tags){
+    public void setTags(List<String> tags){
         this.tags= tags;
     }
     public Date getDate(){
