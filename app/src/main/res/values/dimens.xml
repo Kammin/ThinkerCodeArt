@@ -13,5 +13,6 @@
     <dimen name="default_margin">10dp</dimen>
     <dimen name="card_album_radius">6dp</dimen>
     <dimen name="card_elevation">5dp</dimen>
+    <dimen name="tag_padding">5dp</dimen>
 
 </resources>

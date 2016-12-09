@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.android.volley.Cache;
 import com.android.volley.Request;
@@ -27,6 +29,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     List<Idea> ideas;
+    ProgressBar progressBar;
     public static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
@@ -36,29 +39,8 @@ public class MainActivity extends AppCompatActivity {
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.movies_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         String URL_FEED = "http://thinker-codeart.44fs.preview.openshiftapps.com/restapi/ideas";
-
-/*        ApiInterface apiService =
-                ApiClient.getClient().create(ApiInterface.class);
-
-        Call<List<Idea>> call = apiService.getIdeas();
-
-        call.enqueue(new Callback<List<Idea>>() {
-            @Override
-            public void onResponse(Call<List<Idea>> call, Response<List<Idea>> response) {
-                int statusCode = response.code();
-                Log.d("IDEAS","OK"+response.body().size());
-                ideas = response.body();
-                recyclerView.setAdapter(new IdeaAdapter(ideas, R.layout.item_idea, getApplicationContext()));
-            }
-
-            @Override
-            public void onFailure (Call<List<Idea>> call, Throwable t) {
-                Log.d("IDEAS","NOT");
-                // Log error here since request failed
-                Log.e("", t.toString());
-            }
-        });*/
-
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
         Cache cache = Singleton.getInstance(this).getRequestQueue().getCache();
         Cache.Entry entry = cache.get(URL_FEED);
         if (entry != null) {
@@ -67,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
                 String data = new String(entry.data, "UTF-8");
                 try {
                     parseJsonFeed(new JSONArray(data));
+                    progressBar.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -87,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
                         ideas = new ArrayList<>();
                         parseJsonFeed(response);
                         Log.d(TAG, "ideas length = " + ideas.size());
+                        progressBar.setVisibility(View.GONE);
                         recyclerView.setAdapter(new IdeaAdapter(ideas, R.layout.item_idea, getApplicationContext()));
                     }
                 }
@@ -134,12 +118,12 @@ public class MainActivity extends AppCompatActivity {
 
                 JSONArray objTags = obj.getJSONArray("tags");
                 List<String> tags = new ArrayList<>();
-                for (int k = 0; k < objFiles.length(); k++) {
-                    String tag = objFiles.get(k).toString();
-                    files.add(tag);
+                for (int k = 0; k < objTags.length(); k++) {
+                    String tag = objTags.get(k).toString();
+                    tags.add(tag);
                 }
-                idea.setFiles(tags);
-                Log.d(TAG, " " + i + " " + idea.getBodyIdea());
+                idea.setTags(tags);
+
                 ideas.add(idea);
 
             } catch (JSONException e) {
@@ -147,33 +131,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
-
-/*            for (int i = 0; i < feedArray.length(); i++) {
-                JSONObject feedObj = (JSONObject) feedArray.get(i);
-
-                FeedItem item = new FeedItem();
-                item.setId(feedObj.getInt("id"));
-                item.setName(feedObj.getString("name"));
-
-                // Image might be null sometimes
-                String image = feedObj.isNull("image") ? null : feedObj
-                        .getString("image");
-                item.setImge(image);
-                item.setStatus(feedObj.getString("status"));
-                item.setProfilePic(feedObj.getString("profilePic"));
-                item.setTimeStamp(feedObj.getString("timeStamp"));
-
-                // url might be null sometimes
-                String feedUrl = feedObj.isNull("url") ? null : feedObj
-                        .getString("url");
-                item.setUrl(feedUrl);
-
-                feedItems.add(item);
-            }
-
-            // notify data changes to list adapater
-            listAdapter.notifyDataSetChanged();*/
-
 
     }
 }
