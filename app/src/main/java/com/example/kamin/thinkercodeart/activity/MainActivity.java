@@ -17,6 +17,7 @@ import com.example.kamin.thinkercodeart.R;
 import com.example.kamin.thinkercodeart.adapter.IdeaAdapter;
 import com.example.kamin.thinkercodeart.model.Author;
 import com.example.kamin.thinkercodeart.model.Idea;
+import com.example.kamin.thinkercodeart.util.URL;
 import com.example.kamin.thinkercodeart.volley.Singleton;
 
 import org.json.JSONArray;
@@ -36,15 +37,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.movies_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        String URL_FEED = "http://thinker-codeart.44fs.preview.openshiftapps.com/restapi/ideas";
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
         Cache cache = Singleton.getInstance(this).getRequestQueue().getCache();
-        Cache.Entry entry = cache.get(URL_FEED);
+        Cache.Entry entry = cache.get(URL.IDEAS);
         if (entry != null) {
             // fetch the data from cache
+
             try {
                 String data = new String(entry.data, "UTF-8");
                 try {
@@ -59,8 +63,9 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
             // making fresh volley request and getting json
+
             JsonArrayRequest jsonReq = new JsonArrayRequest(Request.Method.GET,
-                    URL_FEED, null, new com.android.volley.Response.Listener<JSONArray>() {
+                    URL.IDEAS, null, new com.android.volley.Response.Listener<JSONArray>() {
 
                 @Override
                 public void onResponse(JSONArray response) {

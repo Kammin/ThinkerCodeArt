@@ -1,19 +1,25 @@
 package com.example.kamin.thinkercodeart.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
 import com.example.kamin.thinkercodeart.R;
 import com.example.kamin.thinkercodeart.model.Idea;
+import com.example.kamin.thinkercodeart.util.URL;
+import com.example.kamin.thinkercodeart.volley.Singleton;
 
 import java.util.List;
 
@@ -22,7 +28,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
     private List<Idea> ideas;
     private int rowLayout;
     private Context context;
-
+    private static final String TAG = IdeaAdapter.class.getSimpleName();
     public IdeaAdapter(List<Idea> ideas, int rowLayout, Context context) {
         this.ideas = ideas;
         this.rowLayout = rowLayout;
@@ -30,16 +36,17 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
     }
 
     public class IdeaViewHolder extends RecyclerView.ViewHolder {
-        ImageView thumbnail;
+        ImageView avatar;
+        ImageView cover;
         TextView nameIdea;
         TextView bodyIdea;
         TextView author;
         TextView date;
-        TextView tags;
         LinearLayout parentLLforTags;
         public IdeaViewHolder(View itemView) {
             super(itemView);
-            thumbnail = (ImageView) itemView.findViewById(R.id.thumbnail);
+            avatar = (ImageView) itemView.findViewById(R.id.avatar);
+            cover = (ImageView) itemView.findViewById(R.id.cover);
             nameIdea = (TextView) itemView.findViewById(R.id.nameIdea);
             bodyIdea = (TextView) itemView.findViewById(R.id.bodyIdea);
             author = (TextView) itemView.findViewById(R.id.author);
@@ -51,13 +58,14 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
 
     @Override
     public void onViewDetachedFromWindow(IdeaViewHolder holder) {
+        //Log.d(TAG,"Detached From Window "+holder.nameIdea.getText());
         super.onViewDetachedFromWindow(holder);
-        Log.d("",""+holder.nameIdea);
     }
 
     @Override
     public void onViewAttachedToWindow(IdeaViewHolder holder) {
         super.onViewAttachedToWindow(holder);
+        //Log.d("TAG","Attached To Window "+holder.nameIdea.getText());
     }
 
     @Override
@@ -73,6 +81,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
         holder.author.setText(ideas.get(position).getAuthor().getUsername());
         holder.date.setText(DateFormat.format("dd.MM.yyyy", ideas.get(position).getDate()).toString());
         List<String> tags = ideas.get(position).getTags();
+        holder.parentLLforTags.removeAllViews();
         for (int i = 0;i<tags.size();i++){
             final TextView tvTag = new TextView(context);
             holder.parentLLforTags.addView(tvTag);
@@ -86,12 +95,71 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
                 }
             });
         }
+        List<String> photos = ideas.get(position).getFiles();
+
+        String avatarURL = URL.USERS.concat("/"+ideas.get(position).getAuthor().getUserId()+"/avatar");
+        final ImageView imageViewavatar = holder.avatar;
+        ImageLoader.ImageContainer containerAvatar = Singleton.getInstance(context).getImageLoader().get(avatarURL, new ImageLoader.ImageListener() {
+            @Override
+            public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
+                Bitmap bitmap = response.getBitmap();
+                if (bitmap != null) {
+                    imageViewavatar.setImageBitmap(bitmap);
+                    imageViewavatar.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    bitmap.getWidth();
+                    Log.d(TAG, "bitmap.getWidth() " + bitmap.getWidth());
+                    Log.d(TAG, "bitmap.getHeight() " + bitmap.getHeight());
+                    imageViewavatar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+                            Log.d(TAG, "imageView.getWidth " + imageViewavatar.getWidth());
+                            Log.d(TAG, "imageView.getHeight " + imageViewavatar.getHeight());
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        String coverURL = URL.IDEAS.concat("/"+ideas.get(position).getIdeaId()+"/cover");
+        Singleton.getInstance(context).getLruBitmapCache().remove(coverURL);
+        final ImageView imageView = holder.cover;
+        ImageLoader.ImageContainer container = Singleton.getInstance(context).getImageLoader().get(coverURL, new ImageLoader.ImageListener() {
+            @Override
+            public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
+                Bitmap bitmap = response.getBitmap();
+                if (bitmap != null) {
+                    imageView.setImageBitmap(bitmap);
+                    imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    bitmap.getWidth();
+                    Log.d(TAG, "bitmap.getWidth() " + bitmap.getWidth());
+                    Log.d(TAG, "bitmap.getHeight() " + bitmap.getHeight());
+                    imageView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+                            Log.d(TAG, "imageView.getWidth " + imageView.getWidth());
+                            Log.d(TAG, "imageView.getHeight " + imageView.getHeight());
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+
     }
 
     @Override
     public int getItemCount() {
         return ideas.size();
     }
-
 
 }

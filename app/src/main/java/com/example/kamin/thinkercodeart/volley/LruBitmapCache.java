@@ -2,6 +2,7 @@ package com.example.kamin.thinkercodeart.volley;
 
 import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
+import android.util.Log;
 
 import com.android.volley.toolbox.ImageLoader;
 
@@ -10,6 +11,7 @@ public class LruBitmapCache extends LruCache<String, Bitmap> implements
     public static int getDefaultLruCacheSize() {
         final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
         final int cacheSize = maxMemory / 8;
+        Log.d("cacheSize"," "+cacheSize);
         return cacheSize;
     }
 
