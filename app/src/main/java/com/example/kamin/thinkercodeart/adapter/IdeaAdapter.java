@@ -135,16 +135,6 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
                 if (bitmap != null) {
                     imageView.setImageBitmap(bitmap);
                     imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                    bitmap.getWidth();
-                    Log.d(TAG, "bitmap.getWidth() " + bitmap.getWidth());
-                    Log.d(TAG, "bitmap.getHeight() " + bitmap.getHeight());
-                    imageView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                        @Override
-                        public void onGlobalLayout() {
-                            Log.d(TAG, "imageView.getWidth " + imageView.getWidth());
-                            Log.d(TAG, "imageView.getHeight " + imageView.getHeight());
-                        }
-                    });
                 }
             }
 

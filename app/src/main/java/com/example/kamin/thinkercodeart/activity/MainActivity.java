@@ -4,7 +4,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -17,7 +20,6 @@ import com.example.kamin.thinkercodeart.R;
 import com.example.kamin.thinkercodeart.adapter.IdeaAdapter;
 import com.example.kamin.thinkercodeart.model.Author;
 import com.example.kamin.thinkercodeart.model.Idea;
-import com.example.kamin.thinkercodeart.util.URL;
 import com.example.kamin.thinkercodeart.volley.Singleton;
 
 import org.json.JSONArray;
@@ -38,17 +40,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        myToolbar.inflateMenu(R.menu.menu);
+        setSupportActionBar(myToolbar);
 
 
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.movies_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        String URL_FEED = "http://thinker-codeart.44fs.preview.openshiftapps.com/restapi/ideas";
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
         Cache cache = Singleton.getInstance(this).getRequestQueue().getCache();
-        Cache.Entry entry = cache.get(URL.IDEAS);
+        Cache.Entry entry = cache.get(URL_FEED);
         if (entry != null) {
             // fetch the data from cache
-
             try {
                 String data = new String(entry.data, "UTF-8");
                 try {
@@ -63,9 +68,8 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
             // making fresh volley request and getting json
-
             JsonArrayRequest jsonReq = new JsonArrayRequest(Request.Method.GET,
-                    URL.IDEAS, null, new com.android.volley.Response.Listener<JSONArray>() {
+                    URL_FEED, null, new com.android.volley.Response.Listener<JSONArray>() {
 
                 @Override
                 public void onResponse(JSONArray response) {
@@ -91,6 +95,12 @@ public class MainActivity extends AppCompatActivity {
             Singleton.getInstance(this).addToRequestQueue(jsonReq);
         }
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     /**
@@ -137,5 +147,24 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                // User chose the "Settings" item, show the app settings UI...
+                return true;
+
+            case R.id.refresh:
+                // User chose the "Favorite" action, mark the current item
+                // as a favorite...
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 }
