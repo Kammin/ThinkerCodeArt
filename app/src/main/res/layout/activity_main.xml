@@ -1,60 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+
+
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/activity_main"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.example.kamin.thinkercodeart.activity.MainActivity">
+    android:layout_height="match_parent">
 
 
-
-    <android.support.v7.widget.Toolbar
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/my_toolbar"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:elevation="24dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        android:alpha="50"
-        android:animationCache="false"
-        android:backgroundTintMode="src_over" />
+        android:layout_height="wrap_content"
 
-    <ImageButton
-        android:id="@+id/fabButton"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_gravity="end"
-        android:gravity="end"
-        android:background="@mipmap/like"
-        android:src="@mipmap/refresh"
-        android:contentDescription="@null"
-        android:layout_below="@+id/progressBar"
-        android:layout_toRightOf="@+id/progressBar"
-        android:layout_toEndOf="@+id/progressBar" />
+        >
 
-    <android.support.v7.widget.RecyclerView
-        android:background="@color/colorBackRecycle"
-        android:id="@+id/movies_recycler_view"
+        <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/my_toolbar"
+            android:titleTextColor="@color/colorOrange"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:animationCache="false"
+            android:background="?attr/colorPrimary"
+            android:backgroundTintMode="src_over"
+            android:elevation="6dp"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:titleTextColor="@color/colorOrange"
+            app:subtitleTextColor="@color/colorOrange"
+            />
+
+
+    </android.support.design.widget.AppBarLayout>
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/my_toolbar" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <ProgressBar
-        style="?android:attr/progressBarStyleLarge"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/movies_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorBackRecycle"
+            android:scrollbars="vertical" />
+
+
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/progressBar"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:visibility="gone" />
+        android:layout_gravity="end|bottom"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/fab_background"
+        app:borderWidth="0dp"
+        app:layout_behavior="com.example.kamin.thinkercodeart.util.ScrollingFABBehavior"
+        />
 
-
-
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>
