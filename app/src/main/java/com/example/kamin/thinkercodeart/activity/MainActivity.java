@@ -1,6 +1,7 @@
 package com.example.kamin.thinkercodeart.activity;
 
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +10,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.android.volley.Cache;
@@ -33,6 +36,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     List<Idea> ideas;
     ProgressBar progressBar;
+    FloatingActionButton fab;
+    Toolbar toolbar;
     public static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
@@ -43,7 +48,22 @@ public class MainActivity extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         myToolbar.inflateMenu(R.menu.menu);
         setSupportActionBar(myToolbar);
+        getSupportActionBar().setTitle(null);
 
+        fab = (FloatingActionButton) findViewById(R.id.fabButton);
+        toolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        Log.d(TAG,"child "+toolbar.getChildCount());
+        toolbar.setTitle(null);
+        toolbar.setTitleMargin(0,0,0,0);
+
+        final ImageView imageView = (ImageView) toolbar.findViewById(R.id.logo);
+        imageView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+                public void onGlobalLayout() {
+                Log.d(TAG,"left "+imageView.getLeft());
+                imageView.setLeft(15);
+            }
+        });
 
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.movies_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));

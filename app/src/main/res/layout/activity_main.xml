@@ -13,13 +13,11 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
         >
 
-        <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
+        <android.support.v7.widget.Toolbar
             android:id="@+id/my_toolbar"
-            android:titleTextColor="@color/colorOrange"
+            android:title=""
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:animationCache="false"
@@ -28,11 +26,34 @@
             android:elevation="6dp"
             app:layout_scrollFlags="scroll|enterAlways"
             app:titleTextColor="@color/colorOrange"
-            app:subtitleTextColor="@color/colorOrange"
-            />
+            >
 
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="fitStart"
+                android:src="@mipmap/logo1"
+                android:layout_marginTop="10dp"
+                />
+
+        </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@drawable/ic_add"
+        android:tint="@color/colorOrange"
+        app:backgroundTint="@color/colorPrimary"
+        app:borderWidth="0dp"
+        app:layout_behavior="com.example.kamin.thinkercodeart.util.ScrollingFABBehavior"
+        />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -43,10 +64,7 @@
             android:id="@+id/movies_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/colorBackRecycle"
             android:scrollbars="vertical" />
-
-
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -57,17 +75,5 @@
             android:layout_centerVertical="true"
             android:visibility="gone" />
     </RelativeLayout>
-
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fabButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/fab_background"
-        app:borderWidth="0dp"
-        app:layout_behavior="com.example.kamin.thinkercodeart.util.ScrollingFABBehavior"
-        />
 
 </android.support.design.widget.CoordinatorLayout>
