@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onErrorResponse(VolleyError error) {
                     VolleyLog.d(TAG, "Error: " + error.getNetworkTimeMs()+"  "+error.toString());
                     progressBar.setVisibility(View.GONE);
-                    AlertDialogFragment dialogFragment = new AlertDialogFragment();
+                    AlertDialogFragment dialogFragment = AlertDialogFragment.newInstance(5);
                     dialogFragment.show(manager, "dlg1");
                     Log.d(TAG, "fab Click ");
 
