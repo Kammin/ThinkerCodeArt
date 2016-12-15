@@ -1,7 +1,9 @@
 package com.example.kamin.thinkercodeart.activity;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +23,7 @@ import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.example.kamin.thinkercodeart.R;
 import com.example.kamin.thinkercodeart.adapter.IdeaAdapter;
+import com.example.kamin.thinkercodeart.fragment.AlertDialogFragment;
 import com.example.kamin.thinkercodeart.model.Author;
 import com.example.kamin.thinkercodeart.model.Idea;
 import com.example.kamin.thinkercodeart.volley.Singleton;
@@ -38,13 +41,13 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar progressBar;
     FloatingActionButton fab;
     Toolbar toolbar;
+    final FragmentManager manager = getSupportFragmentManager();
     public static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         myToolbar.inflateMenu(R.menu.menu);
         setSupportActionBar(myToolbar);
@@ -55,12 +58,21 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG,"child "+toolbar.getChildCount());
         toolbar.setTitle(null);
         toolbar.setTitleMargin(0,0,0,0);
+        final AppCompatActivity activity = (AppCompatActivity) this;
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialogFragment dialogFragment = new AlertDialogFragment();
 
+                FragmentManager manager = (FragmentManager) activity.getSupportFragmentManager();
+                dialogFragment.show(manager, "dlg1");
+                Log.d(TAG,"fab Click ");
+            }
+        });
         final ImageView imageView = (ImageView) toolbar.findViewById(R.id.logo);
         imageView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
                 public void onGlobalLayout() {
-                Log.d(TAG,"left "+imageView.getLeft());
                 imageView.setLeft(15);
             }
         });
@@ -107,7 +119,12 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    VolleyLog.d(TAG, "Error: " + error.getMessage());
+                    VolleyLog.d(TAG, "Error: " + error.getNetworkTimeMs()+"  "+error.toString());
+                    progressBar.setVisibility(View.GONE);
+                    AlertDialogFragment dialogFragment = new AlertDialogFragment();
+                    dialogFragment.show(manager, "dlg1");
+                    Log.d(TAG, "fab Click ");
+
                 }
             });
 
@@ -186,5 +203,10 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
 
         }
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        return super.onCreateDialog(id);
     }
 }

@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +30,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
     private int rowLayout;
     private Context context;
     private static final String TAG = IdeaAdapter.class.getSimpleName();
+
     public IdeaAdapter(List<Idea> ideas, int rowLayout, Context context) {
         this.ideas = ideas;
         this.rowLayout = rowLayout;
@@ -43,6 +45,8 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
         TextView author;
         TextView date;
         LinearLayout parentLLforTags;
+        ProgressBar progressBarPhoto;
+
         public IdeaViewHolder(View itemView) {
             super(itemView);
             avatar = (ImageView) itemView.findViewById(R.id.avatar);
@@ -52,6 +56,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
             author = (TextView) itemView.findViewById(R.id.author);
             date = (TextView) itemView.findViewById(R.id.date);
             parentLLforTags = (LinearLayout) itemView.findViewById(R.id.parentLLforTags);
+            progressBarPhoto = (ProgressBar) itemView.findViewById(R.id.progressBarPhoto);
         }
     }
 
@@ -82,22 +87,23 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
         holder.date.setText(DateFormat.format("dd.MM.yyyy", ideas.get(position).getDate()).toString());
         List<String> tags = ideas.get(position).getTags();
         holder.parentLLforTags.removeAllViews();
-        for (int i = 0;i<tags.size();i++){
+        holder.cover.setImageBitmap(null);
+        for (int i = 0; i < tags.size(); i++) {
             final TextView tvTag = new TextView(context);
             holder.parentLLforTags.addView(tvTag);
             tvTag.setText(tags.get(i));
-            tvTag.setPadding((int)context.getResources().getDimension(R.dimen.tag_padding),0,0,0);
+            tvTag.setPadding((int) context.getResources().getDimension(R.dimen.tag_padding), 0, 0, 0);
             tvTag.setTextColor(context.getResources().getColor(R.color.colorHashTag));
             tvTag.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(context,""+tvTag.getText(),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "" + tvTag.getText(), Toast.LENGTH_SHORT).show();
                 }
             });
         }
         List<String> photos = ideas.get(position).getFiles();
 
-        String avatarURL = URL.USERS.concat("/"+ideas.get(position).getAuthor().getUserId()+"/avatar");
+        String avatarURL = URL.USERS.concat("/" + ideas.get(position).getAuthor().getUserId() + "/avatar");
         final ImageView imageViewavatar = holder.avatar;
         ImageLoader.ImageContainer containerAvatar = Singleton.getInstance(context).getImageLoader().get(avatarURL, new ImageLoader.ImageListener() {
             @Override
@@ -125,25 +131,30 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
             }
         });
 
-        String coverURL = URL.IDEAS.concat("/"+ideas.get(position).getIdeaId()+"/cover");
-        Singleton.getInstance(context).getLruBitmapCache().remove(coverURL);
-        final ImageView imageView = holder.cover;
-        ImageLoader.ImageContainer container = Singleton.getInstance(context).getImageLoader().get(coverURL, new ImageLoader.ImageListener() {
-            @Override
-            public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-                Bitmap bitmap = response.getBitmap();
-                if (bitmap != null) {
-                    imageView.setImageBitmap(bitmap);
-                    imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        if (photos.size() != 0) {
+            final ProgressBar progressBarPhoto = holder.progressBarPhoto;
+            progressBarPhoto.setVisibility(View.VISIBLE);
+            final String coverURL = URL.IDEAS.concat("/" + ideas.get(position).getIdeaId() + "/cover");
+            final ImageView imageView = holder.cover;
+            final ImageLoader.ImageContainer container = Singleton.getInstance(context).getImageLoader().get(coverURL, new ImageLoader.ImageListener() {
+                @Override
+                public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
+                    Bitmap bitmap = response.getBitmap();
+                    if (bitmap != null) {
+                        imageView.setImageBitmap(bitmap);
+                        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                        progressBarPhoto.setVisibility(View.GONE);
+                    }
                 }
-            }
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    progressBarPhoto.setVisibility(View.GONE);
+                    Log.d(TAG, "ErrorResponse " + coverURL);
 
-            }
-        });
-
+                }
+            });
+        }
 
     }
 
