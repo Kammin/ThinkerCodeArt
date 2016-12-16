@@ -1,8 +1,7 @@
 <resources>
 <string name="app_name">ThinkerCodeArt</string>
-<string name="message_text">Text of your message</string>
-<string name="yes">Yes</string>
-<string name="no">No</string>
-<string name="maybe">Maybe</string>
-<string name="link"><a href="http://thinker-codeart.44fs.preview.openshiftapps.com/">thinker</a> is the service which help you remember your ideas</string>
+    <string name="message_text">Text of your message</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="maybe">Maybe</string>
 </resources>

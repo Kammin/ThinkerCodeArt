@@ -16,37 +16,32 @@ public class AlertDialogFragment extends DialogFragment implements DialogInterfa
 
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder adb = new AlertDialog.Builder(getActivity())
-                .setTitle("Title!").setPositiveButton(R.string.yes, this)
-                .setNegativeButton(R.string.no, this)
-                .setNeutralButton(R.string.maybe, this)
+                .setTitle("Title!").setPositiveButton(R.string.ok, this)
                 .setMessage(R.string.message_text);
+        if(savedInstanceState!=null)
+        Log.d("LOG","savedInstanceState +savedInstanceState.get(\"title\")");
+        Log.d("LOG","savedInstanceState");
         return adb.create();
     }
 
+    public static AlertDialogFragment newInstance(int num) {
+        AlertDialogFragment f = new AlertDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("title", "title");
+        args.putString("messege", "messege");
+        f.setArguments(args);
+        return f;
+    }
+
     public void onClick(DialogInterface dialog, int which) {
-        int i = 0;
-        switch (which) {
-            case Dialog.BUTTON_POSITIVE:
-                i = R.string.yes;
-                break;
-            case Dialog.BUTTON_NEGATIVE:
-                i = R.string.no;
-                break;
-            case Dialog.BUTTON_NEUTRAL:
-                i = R.string.maybe;
-                break;
-        }
-        if (i > 0)
-            Log.d(TAG, "Dialog 2: " + getResources().getString(i));
+
     }
 
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
-        Log.d(TAG, "Dialog 2: onDismiss");
     }
 
     public void onCancel(DialogInterface dialog) {
         super.onCancel(dialog);
-        Log.d(TAG, "Dialog 2: onCancel");
     }
 }
