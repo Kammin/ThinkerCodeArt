@@ -130,12 +130,11 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
 
             }
         });
-
+        final ImageView imageView = holder.cover;
         if (photos.size() != 0) {
             final ProgressBar progressBarPhoto = holder.progressBarPhoto;
             progressBarPhoto.setVisibility(View.VISIBLE);
             final String coverURL = URL.IDEAS.concat("/" + ideas.get(position).getIdeaId() + "/cover");
-            final ImageView imageView = holder.cover;
             final ImageLoader.ImageContainer container = Singleton.getInstance(context).getImageLoader().get(coverURL, new ImageLoader.ImageListener() {
                 @Override
                 public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
@@ -155,6 +154,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
                 }
             });
         }
+        //System.gc();
 
     }
 
