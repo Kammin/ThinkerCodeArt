@@ -4,4 +4,6 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="maybe">Maybe</string>
+    <string name="ok">Ok</string>
+    <string name="link"><a href="http://thinker-codeart.44fs.preview.openshiftapps.com/">thinker</a> is the service which help you remember your ideas</string>
 </resources>
