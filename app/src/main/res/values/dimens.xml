@@ -17,4 +17,7 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="triangleSize">15dp</dimen>
 
+    <dimen name="etMargin">5dp</dimen>
+    <dimen name="etPadding">10dp</dimen>
+
 </resources>
