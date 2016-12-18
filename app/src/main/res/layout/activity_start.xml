@@ -148,7 +148,8 @@
                             android:padding="@dimen/etPadding"
                             android:layout_margin="@dimen/etMargin"
                             android:background="@drawable/rounded_corner_border"
-                            android:selectAllOnFocus="false" />
+                            android:selectAllOnFocus="false"
+                            android:text="Kamin" />
 
 
                         <EditText
@@ -178,7 +179,7 @@
                             android:padding="@dimen/etPadding"
                             android:layout_margin="@dimen/etMargin"
                             android:background="@drawable/rounded_corner_border"
-                            />
+                            android:text="Kamin123" />
 
                         <EditText
                             android:layout_width="match_parent"
@@ -225,10 +226,10 @@
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
                             android:background="@drawable/rounded_corner_border"
-                            android:visibility="gone" />
+                            android:visibility="gone"
+                            android:onClick="onClickSignUp"/>
 
                     </LinearLayout>
-
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

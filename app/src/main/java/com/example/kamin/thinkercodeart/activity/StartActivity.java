@@ -2,6 +2,12 @@ package com.example.kamin.thinkercodeart.activity;
 
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
@@ -17,11 +23,20 @@ import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.StringRequest;
 import com.example.kamin.thinkercodeart.R;
-import com.example.kamin.thinkercodeart.util.URL;
+import com.example.kamin.thinkercodeart.util.AlertDialogActivity;
+import com.example.kamin.thinkercodeart.util.URLs;
 import com.example.kamin.thinkercodeart.volley.Singleton;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.DataOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,6 +68,7 @@ public class StartActivity extends AppCompatActivity {
     }
 
     void onClickLogin(View v) {
+
         etLogin.setVisibility(View.VISIBLE);
         etUsermane.setVisibility(View.GONE);
         etEmail.setVisibility(View.GONE);
@@ -74,7 +90,6 @@ public class StartActivity extends AppCompatActivity {
         etPass.setVisibility(View.VISIBLE);
         etConfirmPass.setVisibility(View.VISIBLE);
 
-
         imageTriangleRight.setVisibility(View.VISIBLE);
         imageTriangleLeft.setVisibility(View.INVISIBLE);
         tvLogin.setTextColor(getResources().getColor(R.color.colorWhite));
@@ -84,61 +99,177 @@ public class StartActivity extends AppCompatActivity {
     }
 
     void onClickSignIn(View v) {
-        Log.d(TAG, "onClickSignIn");
-        login();
         InputMethodManager inputMethodManager = (InputMethodManager) this.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
+        if(!checkConnection())
+            return;
+        String[] params = new String[]{etLogin.getText().toString(), etPass.getText().toString()};
+        new PostClass(this).execute(params);
 
     }
 
-    void login() {
-        Log.d(TAG, "Login");
+    void onClickSignUp(View v) {
+        registerNewUser();
+    }
 
-        final StringRequest loginReq = new StringRequest(Request.Method.POST,
-                URL.LOGIN, new Response.Listener<String>() {
+    void login() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    void error() {
+        Log.d(TAG, "NoLogin... ");
+        Intent intent = new Intent(this, AlertDialogActivity.class);
+        intent.putExtra("MESSAGE", getResources().getString(R.string.NoLogin));
+        startActivity(intent);
+    }
+
+    Boolean checkConnection(){
+        ConnectivityManager cm =
+                (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        Log.d(TAG, "NoConnection... ");
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        if(!isConnected){
+            Log.d(TAG, "NoConnection... ");
+            Intent intent = new Intent(this, AlertDialogActivity.class);
+            intent.putExtra("MESSAGE", getResources().getString(R.string.NoConnection));
+            startActivity(intent);
+        }
+        return isConnected;
+    }
+
+    private class PostClass extends AsyncTask<String[], Void, Void> {
+        private final Context context;
+        ProgressDialog progress;
+        String result = "";
+
+        public PostClass(Context c) {
+            this.context = c;
+        }
+
+        protected void onPreExecute() {
+
+        }
+
+        @Override
+        protected Void doInBackground(String[]... params1) {
+            try {
+                String[] passed = params1[0];
+                URL obj = new URL(URLs.LOGIN);
+                HttpURLConnection conn = (HttpURLConnection) obj.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+
+                conn.setInstanceFollowRedirects(false);
+
+                String urlParameters = "username=" + passed[0] + "&password=" + passed[1];
+                Log.d(TAG, "newUrl ... " + urlParameters);
+                conn.setDoOutput(true);
+                DataOutputStream outputStream = new DataOutputStream(conn.getOutputStream());
+                outputStream.writeBytes(urlParameters);
+                outputStream.flush();
+                outputStream.close();
+
+                boolean redirect = false;
+
+                // normally, 3xx is redirect
+                int status = conn.getResponseCode();
+                Log.d(TAG, "Response Code ... " + conn.getResponseCode());
+
+                if (status == 302) {
+                    String newUrl = conn.getHeaderField("Location");
+                    if (newUrl.contains("entered/home")) {
+                        result = "LOGIN";
+
+                    }
+                    if (newUrl.contains("main?error=true")) {
+                        result = "ERROR";
+                    }
+                    Log.d(TAG, "newUrl ... " + newUrl);
+                    String Cookie = conn.getHeaderField("Set-Cookie");
+                    Log.d(TAG, "Cookie ... " + Cookie);
+                }
+                ;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            StartActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (result.equals("LOGIN")) {
+                        login();
+                        Log.d(TAG, "------------------------------" + result);
+                    }
+                    if (result.equals("ERROR")) {
+                        error();
+                        Log.d(TAG, "------------------------------" + result);
+                    }
+                }
+            });
+
+            return null;
+        }
+    }
+
+    void registerNewUser() {
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("username", "Пользователь");
+            jsonBody.put("email", "testA@gmail.com");
+            jsonBody.put("password", "testA");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        final String requestBody = jsonBody.toString();
+        Log.d(TAG, requestBody);
+        StringRequest jsonReq = new StringRequest(Request.Method.POST,
+                URLs.USERS, new com.android.volley.Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                //Log.d(TAG, "Response: " + response);
-                Log.d(TAG, "response length = " + response.length());
-                Log.d(TAG, "URL.LOGIN = " + URL.LOGIN);
-
+                VolleyLog.d(TAG, "Response: " + response.toString());
             }
         }, new com.android.volley.Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, "Error: " + error.getNetworkTimeMs() + "  " + error.toString());
+                VolleyLog.d(TAG, "Error: " + "  " + error.toString());
             }
         }) {
             @Override
-            protected void deliverResponse(String response) {
-                Log.d(TAG, "Response: " + response);
-                super.deliverResponse(response);
-            }
-
-            @Override
             protected Response<String> parseNetworkResponse(NetworkResponse response) {
-                Log.d(TAG, "Response Code " + response.statusCode);
+                Log.d(TAG, "NetworkResponse " + response.statusCode);
                 return super.parseNetworkResponse(response);
             }
 
             @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("username", "admin");
-                params.put("password", "admin");
-                return params;
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                try {
+                    return requestBody == null ? null : requestBody.getBytes("utf-8");
+                } catch (UnsupportedEncodingException uee) {
+                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+                    return null;
+                }
             }
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Content-Type", "application/x-www-form-urlencoded");
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/json");
+                headers.put("dataType", "TEXT");
+                headers.put("async", "true");
                 return headers;
             }
+
         };
-
-        Singleton.getInstance(this).addToRequestQueue(loginReq);
-
+        // Adding request to volley request queue
+        Singleton.getInstance(this).addToRequestQueue(jsonReq);
     }
-
 }

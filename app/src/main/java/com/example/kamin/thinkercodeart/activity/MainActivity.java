@@ -1,6 +1,6 @@
 package com.example.kamin.thinkercodeart.activity;
 
-import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
@@ -23,9 +23,9 @@ import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.example.kamin.thinkercodeart.R;
 import com.example.kamin.thinkercodeart.adapter.IdeaAdapter;
-import com.example.kamin.thinkercodeart.fragment.AlertDialogFragment;
 import com.example.kamin.thinkercodeart.model.Author;
 import com.example.kamin.thinkercodeart.model.Idea;
+import com.example.kamin.thinkercodeart.util.AlertDialogActivity;
 import com.example.kamin.thinkercodeart.volley.Singleton;
 
 import org.json.JSONArray;
@@ -62,10 +62,9 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialogFragment dialogFragment = new AlertDialogFragment();
-
-                FragmentManager manager = (FragmentManager) activity.getSupportFragmentManager();
-                dialogFragment.show(manager, "dlg1");
+                Intent intent = new Intent(getApplicationContext(), AlertDialogActivity.class);
+                intent.putExtra("MESSAGE", getResources().getString(R.string.NoLogin));
+                startActivity(intent);
                 Log.d(TAG,"fab Click ");
             }
         });
@@ -121,10 +120,6 @@ public class MainActivity extends AppCompatActivity {
                 public void onErrorResponse(VolleyError error) {
                     VolleyLog.d(TAG, "Error: " + error.getNetworkTimeMs()+"  "+error.toString());
                     progressBar.setVisibility(View.GONE);
-                    AlertDialogFragment dialogFragment = AlertDialogFragment.newInstance(5);
-                    dialogFragment.show(manager, "dlg1");
-                    Log.d(TAG, "fab Click ");
-
                 }
             });
 
@@ -193,8 +188,8 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.refresh:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
+                Intent intent = new Intent(this, AlertDialogActivity.class);
+                startActivity(intent);
                 return true;
 
             default:
@@ -205,8 +200,5 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        return super.onCreateDialog(id);
-    }
+
 }

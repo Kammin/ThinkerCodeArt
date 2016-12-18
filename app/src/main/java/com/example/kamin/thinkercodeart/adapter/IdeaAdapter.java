@@ -19,7 +19,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.example.kamin.thinkercodeart.R;
 import com.example.kamin.thinkercodeart.model.Idea;
-import com.example.kamin.thinkercodeart.util.URL;
+import com.example.kamin.thinkercodeart.util.URLs;
 import com.example.kamin.thinkercodeart.volley.Singleton;
 
 import java.util.List;
@@ -103,7 +103,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
         }
         List<String> photos = ideas.get(position).getFiles();
 
-        String avatarURL = URL.USERS.concat("/" + ideas.get(position).getAuthor().getUserId() + "/avatar");
+        String avatarURL = URLs.USERS.concat("/" + ideas.get(position).getAuthor().getUserId() + "/avatar");
         final ImageView imageViewavatar = holder.avatar;
         ImageLoader.ImageContainer containerAvatar = Singleton.getInstance(context).getImageLoader().get(avatarURL, new ImageLoader.ImageListener() {
             @Override
@@ -134,7 +134,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
         if (photos.size() != 0) {
             final ProgressBar progressBarPhoto = holder.progressBarPhoto;
             progressBarPhoto.setVisibility(View.VISIBLE);
-            final String coverURL = URL.IDEAS.concat("/" + ideas.get(position).getIdeaId() + "/cover");
+            final String coverURL = URLs.IDEAS.concat("/" + ideas.get(position).getIdeaId() + "/cover");
             final ImageLoader.ImageContainer container = Singleton.getInstance(context).getImageLoader().get(coverURL, new ImageLoader.ImageListener() {
                 @Override
                 public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {

@@ -5,5 +5,7 @@
     <string name="no">No</string>
     <string name="maybe">Maybe</string>
     <string name="ok">Ok</string>
+    <string name="NoConnection">No internet connection. Check the network settings</string>
+    <string name="NoLogin">Username or password are incorrect</string>
     <string name="link"><a href="http://thinker-codeart.44fs.preview.openshiftapps.com/">thinker</a> is the service which help you remember your ideas</string>
 </resources>
