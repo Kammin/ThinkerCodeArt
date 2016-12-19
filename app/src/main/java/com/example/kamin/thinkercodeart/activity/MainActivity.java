@@ -1,7 +1,9 @@
 package com.example.kamin.thinkercodeart.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -41,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar progressBar;
     FloatingActionButton fab;
     Toolbar toolbar;
+    SharedPreferences sPref;
+    String userName;
     final FragmentManager manager = getSupportFragmentManager();
     public static final String TAG = MainActivity.class.getSimpleName();
 
@@ -48,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        sPref = PreferenceManager.getDefaultSharedPreferences(this);
+        userName = sPref.getString(getResources().getString(R.string.ACTIVE_USER), "");
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         myToolbar.inflateMenu(R.menu.menu);
         setSupportActionBar(myToolbar);
@@ -122,16 +129,15 @@ public class MainActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                 }
             });
-
             // Adding request to volley request queue
             Singleton.getInstance(this).addToRequestQueue(jsonReq);
         }
-
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
+        menu.getItem(1).setTitle(userName);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -180,11 +186,32 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    void logOut(){
+        SharedPreferences.Editor ed = sPref.edit();
+        ed.putString(getResources().getString(R.string.ACTIVE_USER), "");
+        ed.commit();
+        String ActiveUser = sPref.getString(getResources().getString(R.string.ACTIVE_USER), "");
+        Log.d(TAG,"logOut |"+ActiveUser+"|");
+        Log.d(TAG,"logOut");
+        Intent intent = new Intent(this, StartActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
                 // User chose the "Settings" item, show the app settings UI...
+                return true;
+
+            case R.id.action_User:
+
+                return true;
+
+            case R.id.action_logout:
+                logOut();
                 return true;
 
             case R.id.refresh:

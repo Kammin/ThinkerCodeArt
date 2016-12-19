@@ -149,7 +149,7 @@
                             android:layout_margin="@dimen/etMargin"
                             android:background="@drawable/rounded_corner_border"
                             android:selectAllOnFocus="false"
-                            android:text="Kamin" />
+                            />
 
 
                         <EditText
@@ -179,7 +179,7 @@
                             android:padding="@dimen/etPadding"
                             android:layout_margin="@dimen/etMargin"
                             android:background="@drawable/rounded_corner_border"
-                            android:text="Kamin123" />
+                            />
 
                         <EditText
                             android:layout_width="match_parent"

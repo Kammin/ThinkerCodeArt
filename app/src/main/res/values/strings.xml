@@ -1,11 +1,13 @@
 <resources>
 <string name="app_name">ThinkerCodeArt</string>
     <string name="message_text">Text of your message</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
-    <string name="maybe">Maybe</string>
-    <string name="ok">Ok</string>
-    <string name="NoConnection">No internet connection. Check the network settings</string>
-    <string name="NoLogin">Username or password are incorrect</string>
+
+    <string name="ACTIVE_USER">ActiveUser</string>
+    <string name="NoConnection">No internet connection. Check the network settings.</string>
+    <string name="NoLogin">Login or password are incorrect.</string>
+    <string name="RegEmptyFields">All fields are required, empty not allowed.</string>
+    <string name="RegIncorrectEmail">Incorrect email address.</string>
+    <string name="RegIncorrectConfirmation">Password and confirmation are different.</string>
+    <string name="RegSuccessRegister">Congratulations! Data registration was successfully sent to the server.</string>
     <string name="link"><a href="http://thinker-codeart.44fs.preview.openshiftapps.com/">thinker</a> is the service which help you remember your ideas</string>
 </resources>

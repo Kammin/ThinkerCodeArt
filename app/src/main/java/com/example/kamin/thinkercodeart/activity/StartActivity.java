@@ -5,10 +5,12 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -44,12 +46,26 @@ public class StartActivity extends AppCompatActivity {
     TextView tvLogin, tvSignup, btSigin, btSigup;
     EditText etLogin, etPass, etUsermane, etConfirmPass, etEmail;
     ImageView imageTriangleLeft, imageTriangleRight;
+    String username, email, password, confirm;
     final static public String TAG = StartActivity.class.getSimpleName();
+    SharedPreferences sPref;
+    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+
+        context = this;
+        sPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String ActiveUser = sPref.getString(getResources().getString(R.string.ACTIVE_USER), "");
+        Log.d(TAG, "|" + ActiveUser + "|");
+        if (!ActiveUser.equals("")) {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
         TextView textView = (TextView) findViewById(R.id.textViewLink);
         textView.setMovementMethod(LinkMovementMethod.getInstance());
 
@@ -70,10 +86,12 @@ public class StartActivity extends AppCompatActivity {
     void onClickLogin(View v) {
 
         etLogin.setVisibility(View.VISIBLE);
+        etPass.setVisibility(View.VISIBLE);
         etUsermane.setVisibility(View.GONE);
         etEmail.setVisibility(View.GONE);
-        etPass.setVisibility(View.VISIBLE);
         etConfirmPass.setVisibility(View.GONE);
+        etLogin.setText("Kamin");
+        etPass.setText("Kamin123");
 
         imageTriangleRight.setVisibility(View.INVISIBLE);
         imageTriangleLeft.setVisibility(View.VISIBLE);
@@ -89,6 +107,10 @@ public class StartActivity extends AppCompatActivity {
         etEmail.setVisibility(View.VISIBLE);
         etPass.setVisibility(View.VISIBLE);
         etConfirmPass.setVisibility(View.VISIBLE);
+        etUsermane.setText("");
+        etEmail.setText("");
+        etPass.setText("");
+        etConfirmPass.setText("");
 
         imageTriangleRight.setVisibility(View.VISIBLE);
         imageTriangleLeft.setVisibility(View.INVISIBLE);
@@ -101,7 +123,7 @@ public class StartActivity extends AppCompatActivity {
     void onClickSignIn(View v) {
         InputMethodManager inputMethodManager = (InputMethodManager) this.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
-        if(!checkConnection())
+        if (!checkConnection())
             return;
         String[] params = new String[]{etLogin.getText().toString(), etPass.getText().toString()};
         new PostClass(this).execute(params);
@@ -109,10 +131,18 @@ public class StartActivity extends AppCompatActivity {
     }
 
     void onClickSignUp(View v) {
-        registerNewUser();
+        username = etUsermane.getText().toString();
+        email = etEmail.getText().toString();
+        password = etPass.getText().toString();
+        confirm = etConfirmPass.getText().toString();
+        if (checkInputData())
+            registerNewUser();
     }
 
     void login() {
+        SharedPreferences.Editor ed = sPref.edit();
+        ed.putString(getResources().getString(R.string.ACTIVE_USER), etLogin.getText().toString());
+        ed.commit();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
@@ -125,13 +155,13 @@ public class StartActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    Boolean checkConnection(){
+    Boolean checkConnection() {
         ConnectivityManager cm =
-                (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
         Log.d(TAG, "NoConnection... ");
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-        if(!isConnected){
+        if (!isConnected) {
             Log.d(TAG, "NoConnection... ");
             Intent intent = new Intent(this, AlertDialogActivity.class);
             intent.putExtra("MESSAGE", getResources().getString(R.string.NoConnection));
@@ -218,9 +248,9 @@ public class StartActivity extends AppCompatActivity {
     void registerNewUser() {
         JSONObject jsonBody = new JSONObject();
         try {
-            jsonBody.put("username", "Пользователь");
-            jsonBody.put("email", "testA@gmail.com");
-            jsonBody.put("password", "testA");
+            jsonBody.put("username", username);
+            jsonBody.put("email", email);
+            jsonBody.put("password", password);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -241,6 +271,15 @@ public class StartActivity extends AppCompatActivity {
             @Override
             protected Response<String> parseNetworkResponse(NetworkResponse response) {
                 Log.d(TAG, "NetworkResponse " + response.statusCode);
+                if (response.statusCode == 200) {
+                    etUsermane.setText("");
+                    etEmail.setText("");
+                    etPass.setText("");
+                    etConfirmPass.setText("");
+                    Intent intent = new Intent(context, AlertDialogActivity.class);
+                    intent.putExtra("MESSAGE", getResources().getString(R.string.RegSuccessRegister));
+                    startActivity(intent);
+                }
                 return super.parseNetworkResponse(response);
             }
 
@@ -271,5 +310,26 @@ public class StartActivity extends AppCompatActivity {
         };
         // Adding request to volley request queue
         Singleton.getInstance(this).addToRequestQueue(jsonReq);
+    }
+
+    Boolean checkInputData() {
+        Intent intent = new Intent(this, AlertDialogActivity.class);
+        if ((username.equals("")) | (email.equals("")) | (password.equals("")) | (confirm.equals(""))) {
+            intent.putExtra("MESSAGE", getResources().getString(R.string.RegEmptyFields));
+            startActivity(intent);
+            return false;
+        }
+        if (!(email.contains("@")) | !(email.contains("."))) {
+            intent.putExtra("MESSAGE", getResources().getString(R.string.RegIncorrectEmail));
+            startActivity(intent);
+            return false;
+        }
+        if (!(password.equals(confirm))) {
+            intent.putExtra("MESSAGE", getResources().getString(R.string.RegIncorrectConfirmation));
+            startActivity(intent);
+            return false;
+        }
+
+        return true;
     }
 }

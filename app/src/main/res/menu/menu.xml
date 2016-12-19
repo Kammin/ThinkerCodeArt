@@ -9,8 +9,15 @@
         android:icon="@drawable/ic_refresh"
         app:showAsAction="ifRoom"/>
 
-    <!-- Settings, should always be in the overflow -->
+    <item android:id="@+id/action_User"
+        android:title="User"
+        app:showAsAction="never"/>
+
     <item android:id="@+id/action_settings"
         android:title="My Ideas"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/action_logout"
+        android:title="Logout"
         app:showAsAction="never"/>
 </menu>
