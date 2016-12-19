@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     Toolbar toolbar;
     SharedPreferences sPref;
     String userName;
-    final FragmentManager manager = getSupportFragmentManager();
+    final FragmentManager manager = getSupportFragmentManager( );
     public static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
