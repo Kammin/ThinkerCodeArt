@@ -90,8 +90,6 @@ public class StartActivity extends AppCompatActivity {
         etUsermane.setVisibility(View.GONE);
         etEmail.setVisibility(View.GONE);
         etConfirmPass.setVisibility(View.GONE);
-        etLogin.setText("Kamin");
-        etPass.setText("Kamin123");
 
         imageTriangleRight.setVisibility(View.INVISIBLE);
         imageTriangleLeft.setVisibility(View.VISIBLE);
@@ -138,6 +136,22 @@ public class StartActivity extends AppCompatActivity {
         if (checkInputData())
             registerNewUser();
     }
+
+    void regSuccessfully() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+        onClickLogin(null);
+        etLogin.setText(username);
+        etPass.setText(password);
+        Intent intent = new Intent(this, AlertDialogActivity.class);
+        intent.putExtra("MESSAGE", getResources().getString(R.string.RegSuccessRegister));
+        startActivity(intent);
+    }
+
 
     void login() {
         SharedPreferences.Editor ed = sPref.edit();
@@ -195,7 +209,6 @@ public class StartActivity extends AppCompatActivity {
                 conn.setInstanceFollowRedirects(false);
 
                 String urlParameters = "username=" + passed[0] + "&password=" + passed[1];
-                Log.d(TAG, "newUrl ... " + urlParameters);
                 conn.setDoOutput(true);
                 DataOutputStream outputStream = new DataOutputStream(conn.getOutputStream());
                 outputStream.writeBytes(urlParameters);
@@ -272,13 +285,17 @@ public class StartActivity extends AppCompatActivity {
             protected Response<String> parseNetworkResponse(NetworkResponse response) {
                 Log.d(TAG, "NetworkResponse " + response.statusCode);
                 if (response.statusCode == 200) {
-                    etUsermane.setText("");
-                    etEmail.setText("");
-                    etPass.setText("");
-                    etConfirmPass.setText("");
-                    Intent intent = new Intent(context, AlertDialogActivity.class);
-                    intent.putExtra("MESSAGE", getResources().getString(R.string.RegSuccessRegister));
-                    startActivity(intent);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            onClickLogin(null);
+                            etLogin.setText(username);
+                            etPass.setText(password);
+                            Intent intent = new Intent(context, AlertDialogActivity.class);
+                            intent.putExtra("MESSAGE", getResources().getString(R.string.RegSuccessRegister));
+                            startActivity(intent);
+                        }
+                    });
                 }
                 return super.parseNetworkResponse(response);
             }

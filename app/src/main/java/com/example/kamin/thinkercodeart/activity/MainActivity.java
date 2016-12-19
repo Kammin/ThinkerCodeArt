@@ -69,8 +69,8 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), AlertDialogActivity.class);
-                intent.putExtra("MESSAGE", getResources().getString(R.string.NoLogin));
+                Intent intent = new Intent(getApplicationContext(), IdeaActivity.class);
+                intent.addFlags(Intent.FLAG_FROM_BACKGROUND);
                 startActivity(intent);
                 Log.d(TAG,"fab Click ");
             }
