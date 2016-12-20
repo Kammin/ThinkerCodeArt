@@ -59,7 +59,7 @@ public class StartActivity extends AppCompatActivity {
         context = this;
         sPref = PreferenceManager.getDefaultSharedPreferences(this);
         String ActiveUser = sPref.getString(getResources().getString(R.string.ACTIVE_USER), "");
-        Log.d(TAG, "|" + ActiveUser + "|");
+
         if (!ActiveUser.equals("")) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);

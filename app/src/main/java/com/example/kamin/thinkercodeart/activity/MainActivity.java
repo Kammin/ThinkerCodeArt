@@ -28,6 +28,7 @@ import com.example.kamin.thinkercodeart.adapter.IdeaAdapter;
 import com.example.kamin.thinkercodeart.model.Author;
 import com.example.kamin.thinkercodeart.model.Idea;
 import com.example.kamin.thinkercodeart.util.AlertDialogActivity;
+import com.example.kamin.thinkercodeart.util.URLs;
 import com.example.kamin.thinkercodeart.volley.Singleton;
 
 import org.json.JSONArray;
@@ -39,57 +40,87 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    List<Idea> ideas;
+
     ProgressBar progressBar;
     FloatingActionButton fab;
     Toolbar toolbar;
     SharedPreferences sPref;
     String userName;
-    final FragmentManager manager = getSupportFragmentManager( );
+    RecyclerView recyclerView;
+    final FragmentManager manager = getSupportFragmentManager();
     public static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume");
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        Log.d(TAG, "onPause");
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.d(TAG, "onStop");
+        super.onStop();
+    }
+
+    @Override
+    protected void onStart() {
+        Log.d(TAG, "onStart");
+        super.onStart();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         sPref = PreferenceManager.getDefaultSharedPreferences(this);
         userName = sPref.getString(getResources().getString(R.string.ACTIVE_USER), "");
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
-        myToolbar.inflateMenu(R.menu.menu);
-        setSupportActionBar(myToolbar);
+        toolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        toolbar.inflateMenu(R.menu.menu);
+        setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(null);
+        toolbar.setTitle(null);
+        toolbar.setTitleMargin(0, 0, 0, 0);
 
         fab = (FloatingActionButton) findViewById(R.id.fabButton);
-        toolbar = (Toolbar) findViewById(R.id.my_toolbar);
-        Log.d(TAG,"child "+toolbar.getChildCount());
-        toolbar.setTitle(null);
-        toolbar.setTitleMargin(0,0,0,0);
-        final AppCompatActivity activity = (AppCompatActivity) this;
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), IdeaActivity.class);
                 intent.addFlags(Intent.FLAG_FROM_BACKGROUND);
                 startActivity(intent);
-                Log.d(TAG,"fab Click ");
+                Log.d(TAG, "fab Click ");
             }
         });
         final ImageView imageView = (ImageView) toolbar.findViewById(R.id.logo);
         imageView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
-                public void onGlobalLayout() {
+            public void onGlobalLayout() {
                 imageView.setLeft(15);
             }
         });
 
-        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.movies_recycler_view);
+        recyclerView = (RecyclerView) findViewById(R.id.movies_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        String URL_FEED = "http://thinker-codeart.44fs.preview.openshiftapps.com/restapi/ideas";
+        if (Singleton.getInstance(this).ideas == null)
+            feedIdeas();
+        else
+            recyclerView.setAdapter(new IdeaAdapter(Singleton.getInstance(getApplicationContext()).ideas, R.layout.item_idea, getApplicationContext()));
+
+    }
+
+    void feedIdeas() {
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
         Cache cache = Singleton.getInstance(this).getRequestQueue().getCache();
-        Cache.Entry entry = cache.get(URL_FEED);
+        Cache.Entry entry = cache.get(URLs.IDEAS);
         if (entry != null) {
             // fetch the data from cache
             try {
@@ -107,31 +138,32 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // making fresh volley request and getting json
             JsonArrayRequest jsonReq = new JsonArrayRequest(Request.Method.GET,
-                    URL_FEED, null, new com.android.volley.Response.Listener<JSONArray>() {
+                    URLs.IDEAS, null, new com.android.volley.Response.Listener<JSONArray>() {
 
                 @Override
                 public void onResponse(JSONArray response) {
                     VolleyLog.d(TAG, "Response: " + response.toString());
                     if (response != null) {
                         Log.d(TAG, "response length = " + response.length());
-                        ideas = new ArrayList<>();
+                        Singleton.getInstance(getApplicationContext()).ideas = new ArrayList<>();
                         parseJsonFeed(response);
-                        Log.d(TAG, "ideas length = " + ideas.size());
+                        Log.d(TAG, "ideas length = " + Singleton.getInstance(getApplicationContext()).ideas.size());
                         progressBar.setVisibility(View.GONE);
-                        recyclerView.setAdapter(new IdeaAdapter(ideas, R.layout.item_idea, getApplicationContext()));
+                        recyclerView.setAdapter(new IdeaAdapter(Singleton.getInstance(getApplicationContext()).ideas, R.layout.item_idea, getApplicationContext()));
                     }
                 }
             }, new com.android.volley.Response.ErrorListener() {
 
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    VolleyLog.d(TAG, "Error: " + error.getNetworkTimeMs()+"  "+error.toString());
+                    VolleyLog.d(TAG, "Error: " + error.getNetworkTimeMs() + "  " + error.toString());
                     progressBar.setVisibility(View.GONE);
                 }
             });
             // Adding request to volley request queue
             Singleton.getInstance(this).addToRequestQueue(jsonReq);
         }
+
     }
 
     @Override
@@ -177,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 idea.setTags(tags);
 
-                ideas.add(idea);
+                Singleton.getInstance(this).ideas.add(idea);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -187,13 +219,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    void logOut(){
+    void logOut() {
         SharedPreferences.Editor ed = sPref.edit();
         ed.putString(getResources().getString(R.string.ACTIVE_USER), "");
         ed.commit();
         String ActiveUser = sPref.getString(getResources().getString(R.string.ACTIVE_USER), "");
-        Log.d(TAG,"logOut |"+ActiveUser+"|");
-        Log.d(TAG,"logOut");
+        Log.d(TAG, "logOut |" + ActiveUser + "|");
+        Log.d(TAG, "logOut");
         Intent intent = new Intent(this, StartActivity.class);
         startActivity(intent);
         finish();

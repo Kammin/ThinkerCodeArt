@@ -8,10 +8,12 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
+import com.example.kamin.thinkercodeart.model.Idea;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 public class Singleton {
 
@@ -21,6 +23,7 @@ public class Singleton {
     LruBitmapCache mLruBitmapCache;
     private static Context context;
     private static Singleton instance;
+    public List<Idea> ideas;
 
     private Singleton(Context context) {
         this.context = context;

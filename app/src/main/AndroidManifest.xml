@@ -12,7 +12,12 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".activity.MainActivity"></activity>
-        <activity android:name=".activity.IdeaActivity"></activity>
+        <activity android:name=".activity.IdeaActivity"
+            android:parentActivityName=".activity.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.kamin.thinkercodeart.activity.MainActivity" />
+        </activity>
         <activity android:name=".util.AlertDialogActivity"
             android:theme="@android:style/Theme.Holo.Dialog.NoActionBar"></activity>
 

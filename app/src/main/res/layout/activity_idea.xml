@@ -1,6 +1,190 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackRecycle"
+    android:orientation="vertical"
+    android:weightSum="1">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:animationCache="false"
+        android:background="?attr/colorPrimary"
+        android:backgroundTintMode="src_over"
+        android:elevation="6dp"
+        app:layout_scrollFlags="scroll|enterAlways"
+        app:titleTextColor="@color/colorOrange"/>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:selectAllOnFocus="false">
+
+            <EditText
+                android:id="@+id/etName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/card_margin"
+                android:background="@drawable/rounded_corner_white"
+                android:ems="10"
+                android:hint="Name"
+                android:inputType="textPersonName"
+                android:padding="@dimen/etMargin"
+
+                />
+
+            <EditText
+                android:id="@+id/etBody"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/card_margin"
+                android:layout_marginLeft="@dimen/card_margin"
+                android:layout_marginRight="@dimen/card_margin"
+                android:background="@drawable/rounded_corner_white"
+                android:ems="10"
+                android:gravity="top|left"
+                android:hint="Description"
+                android:inputType="textMultiLine"
+                android:lines="5"
+                android:padding="@dimen/etMargin"
+                android:scrollHorizontally="false" />
+
+            <TextView
+                android:id="@+id/btAddFile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/card_margin"
+                android:layout_marginRight="@dimen/card_margin"
+
+                android:background="@drawable/rounded_corner_white"
+                android:padding="@dimen/card_margin"
+                android:text="Add file"
+                android:textColor="@color/colorOrange" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/card_margin"
+                android:layout_marginRight="@dimen/card_margin">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:id="@+id/LLfiles"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/im1"
+                        android:layout_width="@dimen/imageSize"
+                        android:layout_height="@dimen/imageSize"
+                        android:layout_marginBottom="@dimen/etMargin"
+                        android:layout_marginLeft="@dimen/etMargin"
+                        android:layout_marginTop="@dimen/etMargin"
+                        android:layout_weight="1"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@mipmap/empty_avatar" />
+
+                    <ImageView
+                        android:id="@+id/im2"
+                        android:layout_width="@dimen/imageSize"
+                        android:layout_height="@dimen/imageSize"
+                        android:layout_marginBottom="@dimen/etMargin"
+                        android:layout_marginLeft="@dimen/etMargin"
+                        android:layout_marginTop="@dimen/etMargin"
+                        android:layout_weight="1"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@mipmap/empty_avatar" />
+
+                    <ImageView
+                        android:id="@+id/im3"
+                        android:layout_width="@dimen/imageSize"
+                        android:layout_height="@dimen/imageSize"
+                        android:layout_marginBottom="@dimen/etMargin"
+                        android:layout_marginLeft="@dimen/etMargin"
+                        android:layout_marginTop="@dimen/etMargin"
+                        android:layout_weight="1"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@mipmap/empty_avatar" />
+
+                    <ImageView
+                        android:id="@+id/im4"
+                        android:layout_width="@dimen/imageSize"
+                        android:layout_height="@dimen/imageSize"
+                        android:layout_marginBottom="@dimen/etMargin"
+                        android:layout_marginLeft="@dimen/etMargin"
+                        android:layout_marginTop="@dimen/etMargin"
+                        android:layout_weight="1"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@mipmap/empty_avatar" />
+
+                    <ImageView
+                        android:id="@+id/im5"
+                        android:layout_width="@dimen/imageSize"
+                        android:layout_height="@dimen/imageSize"
+                        android:layout_marginBottom="@dimen/etMargin"
+                        android:layout_marginLeft="@dimen/etMargin"
+                        android:layout_marginTop="@dimen/etMargin"
+                        android:layout_weight="1"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@mipmap/empty_avatar" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <EditText
+                android:id="@+id/etTags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/card_margin"
+                android:background="@drawable/rounded_corner_white"
+                android:ems="10"
+                android:hint="Tags"
+                android:inputType="textPersonName"
+                android:padding="@dimen/etMargin" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="right">
+
+                <TextView
+                    android:id="@+id/btCancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/card_margin"
+                    android:background="@drawable/rounded_corner_white"
+                    android:padding="@dimen/card_margin"
+                    android:text="Cancel"
+                    android:textSize="18dp"
+                    android:onClick="onClickCancel"
+                    android:textColor="@color/colorGreyLight" />
+
+                <TextView
+                    android:id="@+id/btCreate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/card_margin"
+                    android:layout_marginRight="@dimen/card_margin"
+                    android:background="@drawable/rounded_corner_white"
+                    android:padding="@dimen/card_margin"
+                    android:textSize="18dp"
+                    android:text="Create"
+                    android:textStyle="bold"
+                    android:onClick="onClickCreate"
+                    android:textColor="@color/colorOrange" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
 
 </LinearLayout>
