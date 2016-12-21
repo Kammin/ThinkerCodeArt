@@ -1,6 +1,7 @@
 package com.example.kamin.thinkercodeart.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -60,6 +61,11 @@ public class IdeaActivity extends AppCompatActivity {
         body = etBody.getText().toString();
         tags = etTags.getText().toString();
         addRequest();
+    }
+
+    void onClickAddFile(View v){
+        Intent intent = new Intent(this, FilePickerActivity.class);
+        startActivity(intent);
     }
 
     void onClickCancel(View v){

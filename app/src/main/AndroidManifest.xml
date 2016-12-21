@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -12,23 +13,30 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".activity.MainActivity"></activity>
-        <activity android:name=".activity.IdeaActivity"
-            android:parentActivityName=".activity.MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.kamin.thinkercodeart.activity.MainActivity" />
+        <activity android:name=".activity.FilePickerActivity">
+            android:theme="@android:style/Theme.Holo.Dialog.NoActionBar">
         </activity>
-        <activity android:name=".util.AlertDialogActivity"
-            android:theme="@android:style/Theme.Holo.Dialog.NoActionBar"></activity>
 
-        <activity android:name=".activity.StartActivity"
-            android:windowSoftInputMode="adjustPan">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+    <activity
+        android:name=".activity.IdeaActivity"
+        android:parentActivityName=".activity.MainActivity">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.example.kamin.thinkercodeart.activity.MainActivity" />
+    </activity>
+    <activity
+        android:name=".util.AlertDialogActivity"
+        android:theme="@android:style/Theme.Holo.Dialog.NoActionBar"></activity>
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-    </application>
+    <activity
+        android:name=".activity.StartActivity"
+        android:windowSoftInputMode="adjustPan">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
 
-</manifest>
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
+</application>
+
+    </manifest>

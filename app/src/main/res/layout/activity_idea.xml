@@ -68,7 +68,7 @@
                 android:background="@drawable/rounded_corner_white"
                 android:padding="@dimen/card_margin"
                 android:text="Add file"
-                android:textColor="@color/colorOrange" />
+                android:onClick="onClickAddFile" />
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
