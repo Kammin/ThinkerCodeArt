@@ -1,17 +1,14 @@
 package com.example.kamin.thinkercodeart.activity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -22,17 +19,12 @@ import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.StringRequest;
 import com.example.kamin.thinkercodeart.R;
-import com.example.kamin.thinkercodeart.util.AlertDialogActivity;
 import com.example.kamin.thinkercodeart.util.URLs;
+import com.example.kamin.thinkercodeart.volley.MultipartRequest;
 import com.example.kamin.thinkercodeart.volley.Singleton;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,23 +33,20 @@ public class IdeaActivity extends AppCompatActivity {
     final static public String TAG = StartActivity.class.getSimpleName();
     String name, body, tags;
     Context context;
-    byte[] fileData1;
-    byte[] fileData2;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_idea);
 
         context = this;
-        byte[] fileData1 = getFileDataFromDrawable(context, R.drawable.ic_refresh);
-        byte[] fileData2 = getFileDataFromDrawable(context, R.drawable.fab_background);
         Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         toolbar.inflateMenu(R.menu.menu);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.CreateIdea);
         toolbar.setTitleMargin(0,0,0,0);
-        ActionBar ab = getSupportActionBar();
-        //ab.setDisplayHomeAsUpEnabled(true);
+
+
 
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
@@ -70,7 +59,7 @@ public class IdeaActivity extends AppCompatActivity {
         name = etName.getText().toString();
         body = etBody.getText().toString();
         tags = etTags.getText().toString();
-
+        addRequest();
     }
 
     void onClickCancel(View v){
@@ -78,109 +67,56 @@ public class IdeaActivity extends AppCompatActivity {
     }
 
     void addRequest(){
-        StringRequest strReq = new StringRequest(Request.Method.POST,
-                URLs.IDEAS_ADD_FILES, new com.android.volley.Response.Listener<String>() {
+        MultipartRequest multipartRequest = new MultipartRequest(Request.Method.POST, URLs.IDEAS_ADD_FILES, new Response.Listener<NetworkResponse>() {
             @Override
-            public void onResponse(String response) {
-                VolleyLog.d(TAG, "Response: " + response.toString());
+            public void onResponse(NetworkResponse response) {
+                String resultResponse = new String(response.data);
+                // parse success output
+                Log.d(TAG,"resultResponse "+resultResponse);
             }
-        }, new com.android.volley.Response.ErrorListener() {
+        }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Error: " + "  " + error.toString());
+                error.printStackTrace();
             }
         }) {
-            @Override
-            protected Response<String> parseNetworkResponse(NetworkResponse response) {
-                Log.d(TAG, "NetworkResponse " + response.statusCode);
-                if (response.statusCode == 200) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Intent intent = new Intent(context, AlertDialogActivity.class);
-                            intent.putExtra("MESSAGE", getResources().getString(R.string.RegSuccessRegister));
-                            startActivity(intent);
-                        }
-                    });
-                }
-                return super.parseNetworkResponse(response);
-            }
 
             @Override
-            public String getBodyContentType() {
-                return "application/json; charset=utf-8";
-            }
-
-            @Override
-            public byte[] getBody() throws AuthFailureError {
-                Map<String,String> params = new HashMap<>();
-                params.add("mobile_number","mobileNumber");
-                String postBody = createPostBody(params);
-
-                return postBody.getBytes();
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("name", "tags");
+                params.put("description", "tags");
+                params.put("tags", "#tags");
+                return params;
             }
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> params = new HashMap<String, String>();
-                String creds = String.format("%s:%s","Kamin","kam");
-                String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.DEFAULT);
-                params.put("Authorization", auth);
-                return params;
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Authorization", "Basic a2FtaW46a2Ft");
+                return headers;
             }
 
+            @Override
+            protected Map<String, DataPart> getByteData() {
+                Map<String, DataPart> params = new HashMap<>();
+
+                params.put("files", new DataPart("file_avatar.jpg", getFileDataFromDrawable(getBaseContext(), R.mipmap.muz), "image/jpeg"));
+                params.put("files", new DataPart("file_cover.jpg", getFileDataFromDrawable(getBaseContext(), R.mipmap.empty_avatar), "image/jpeg"));
+
+                return params;
+            }
         };
 
-        // Adding request to volley request queue
-        Singleton.getInstance(this).addToRequestQueue(strReq);
+        Singleton.getInstance(getBaseContext()).addToRequestQueue(multipartRequest);
     }
-
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    DataOutputStream dos = new DataOutputStream(bos);
-    try {
-        // the first file
-        buildPart(dos, fileData1, "ic_action_android.png");
-        // the second file
-        buildPart(dos, fileData2, "ic_action_book.png");
-        // send multipart form data necesssary after file data
-        dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-        // pass to multipart body
-        multipartBody = bos.toByteArray();
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-
-    private void buildPart(DataOutputStream dataOutputStream, byte[] fileData, String fileName) throws IOException {
-        dataOutputStream.writeBytes(twoHyphens + boundary + lineEnd);
-        dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\"; filename=\""
-                + fileName + "\"" + lineEnd);
-        dataOutputStream.writeBytes(lineEnd);
-
-        ByteArrayInputStream fileInputStream = new ByteArrayInputStream(fileData);
-        int bytesAvailable = fileInputStream.available();
-
-        int maxBufferSize = 1024 * 1024;
-        int bufferSize = Math.min(bytesAvailable, maxBufferSize);
-        byte[] buffer = new byte[bufferSize];
-
-        // read file and write it into form...
-        int bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-
-        while (bytesRead > 0) {
-            dataOutputStream.write(buffer, 0, bufferSize);
-            bytesAvailable = fileInputStream.available();
-            bufferSize = Math.min(bytesAvailable, maxBufferSize);
-            bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-        }
-
-        dataOutputStream.writeBytes(lineEnd);
-    }
-
-    private byte[] getFileDataFromDrawable(Context context, int id) {
+    public static byte[] getFileDataFromDrawable(Context context, int id) {
         Drawable drawable = ContextCompat.getDrawable(context, id);
-        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(),id);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
         return byteArrayOutputStream.toByteArray();
     }
-}
+
+
+ }
