@@ -50,29 +50,6 @@ public class MainActivity extends AppCompatActivity {
     final FragmentManager manager = getSupportFragmentManager();
     public static final String TAG = MainActivity.class.getSimpleName();
 
-    @Override
-    protected void onResume() {
-        Log.d(TAG, "onResume");
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        Log.d(TAG, "onPause");
-        super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        Log.d(TAG, "onStop");
-        super.onStop();
-    }
-
-    @Override
-    protected void onStart() {
-        Log.d(TAG, "onStart");
-        super.onStart();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

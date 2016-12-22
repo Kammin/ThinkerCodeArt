@@ -66,7 +66,7 @@ public class IdeaActivity extends AppCompatActivity {
     }
 
     void onClickAddFile(View v){
-        Intent intent = new Intent(this, FilePickerActivity.class);
+        Intent intent = new Intent(this, FileManagerActivity.class);
         startActivity(intent);
     }
 

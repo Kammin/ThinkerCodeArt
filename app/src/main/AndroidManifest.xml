@@ -4,6 +4,10 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.STO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
 
     <application
         android:allowBackup="true"
@@ -13,7 +17,12 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".activity.MainActivity"></activity>
-        <activity android:name=".activity.FilePickerActivity">
+        <activity android:name=".activity.FileManagerActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
      <!--       android:theme="@style/Theme.AppCompat.DayNight.Dialog.Alert">-->
         </activity>
 
@@ -30,11 +39,7 @@
     <activity
         android:name=".activity.StartActivity"
         android:windowSoftInputMode="adjustPan">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
     </activity>
 </application>
 
