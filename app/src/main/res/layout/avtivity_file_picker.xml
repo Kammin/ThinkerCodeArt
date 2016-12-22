@@ -1,7 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:animationCache="false"
+        android:background="?attr/colorPrimary"
+        android:backgroundTintMode="src_over"
+        android:elevation="6dp"
+        app:layout_scrollFlags="scroll|enterAlways"
+        app:titleTextColor="@color/colorOrange">
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_arrow_back_24dp"
+        android:background="@android:color/transparent"
+        android:id="@+id/imageButton"
+        android:onClick="onClickBack"/>
+        <TextView
+            android:text="@string/selectPhoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorOrange"
+            android:layout_gravity="right"
+            android:layout_marginRight="15dp"
+            android:textSize="20dp"
+            android:id="@+id/textView" />
+
+    </android.support.v7.widget.Toolbar>
+
+
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/pic_recycler_view"
@@ -9,15 +42,17 @@
         android:layout_height="77dp"
         android:scrollbars="horizontal" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/file_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="345dp"
-        android:scrollbars="horizontal" />
-
     <Button
         android:text="Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/button2" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/file_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical" />
+
+
 </LinearLayout>

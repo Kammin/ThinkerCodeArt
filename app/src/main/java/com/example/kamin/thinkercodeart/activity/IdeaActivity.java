@@ -34,7 +34,7 @@ public class IdeaActivity extends AppCompatActivity {
     final static public String TAG = StartActivity.class.getSimpleName();
     String name, body, tags;
     Context context;
-
+    EditText etName, etBody, etTags;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,16 +47,18 @@ public class IdeaActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(R.string.CreateIdea);
         toolbar.setTitleMargin(0,0,0,0);
 
-
+        etName = (EditText) findViewById(R.id.etName);
+        etBody = (EditText) findViewById(R.id.etBody);
+        etTags = (EditText) findViewById(R.id.etTags);
+        etName.setText("Name bla");
+        etBody.setText("Body bla bla bla bla bla bla");
+        etTags.setText("#bla #bla");
 
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
     }
 
     void onClickCreate(View v){
-        EditText etName = (EditText) findViewById(R.id.etName);
-        EditText etBody = (EditText) findViewById(R.id.etBody);
-        EditText etTags = (EditText) findViewById(R.id.etTags);
         name = etName.getText().toString();
         body = etBody.getText().toString();
         tags = etTags.getText().toString();
@@ -90,9 +92,9 @@ public class IdeaActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put("name", "tags");
-                params.put("description", "tags");
-                params.put("tags", "#tags");
+                params.put("name", name);
+                params.put("description", body);
+                params.put("tags", tags);
                 return params;
             }
 
@@ -104,12 +106,12 @@ public class IdeaActivity extends AppCompatActivity {
             }
 
             @Override
-            protected Map<String, DataPart> getByteData() {
-                Map<String, DataPart> params = new HashMap<>();
-
-                params.put("files", new DataPart("file_avatar.jpg", getFileDataFromDrawable(getBaseContext(), R.mipmap.muz), "image/jpeg"));
-                params.put("files", new DataPart("file_cover.jpg", getFileDataFromDrawable(getBaseContext(), R.mipmap.empty_avatar), "image/jpeg"));
-
+            protected Map<String, DataPart[]> getByteData() {
+                Map<String, DataPart[]> params = new HashMap<>();
+                DataPart[] dataParts = new DataPart[2];
+                dataParts[0] = new DataPart("file_avatar.jpg", getFileDataFromDrawable(getBaseContext(), R.mipmap.android), "image/jpeg");
+                dataParts[1] = new DataPart("file_avatar.jpg", getFileDataFromDrawable(getBaseContext(), R.mipmap.empty_avatar), "image/jpeg");
+                params.put("files", dataParts);
                 return params;
             }
         };

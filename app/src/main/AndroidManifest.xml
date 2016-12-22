@@ -14,7 +14,7 @@
 
         <activity android:name=".activity.MainActivity"></activity>
         <activity android:name=".activity.FilePickerActivity">
-            android:theme="@android:style/Theme.Holo.Dialog.NoActionBar">
+     <!--       android:theme="@style/Theme.AppCompat.DayNight.Dialog.Alert">-->
         </activity>
 
     <activity
@@ -27,7 +27,6 @@
     <activity
         android:name=".util.AlertDialogActivity"
         android:theme="@android:style/Theme.Holo.Dialog.NoActionBar"></activity>
-
     <activity
         android:name=".activity.StartActivity"
         android:windowSoftInputMode="adjustPan">

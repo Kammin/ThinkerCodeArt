@@ -27,8 +27,8 @@ public class MultipartRequest extends Request<NetworkResponse> {
 
 
     public MultipartRequest(String url, Map<String, String> headers,
-                                  Response.Listener<NetworkResponse> listener,
-                                  Response.ErrorListener errorListener) {
+                            Response.Listener<NetworkResponse> listener,
+                            Response.ErrorListener errorListener) {
         super(Method.POST, url, errorListener);
         this.mListener = listener;
         this.mErrorListener = errorListener;
@@ -37,8 +37,8 @@ public class MultipartRequest extends Request<NetworkResponse> {
 
 
     public MultipartRequest(int method, String url,
-                                  Response.Listener<NetworkResponse> listener,
-                                  Response.ErrorListener errorListener) {
+                            Response.Listener<NetworkResponse> listener,
+                            Response.ErrorListener errorListener) {
         super(method, url, errorListener);
         this.mListener = listener;
         this.mErrorListener = errorListener;
@@ -67,7 +67,7 @@ public class MultipartRequest extends Request<NetworkResponse> {
             }
 
             // populate data byte payload
-            Map<String, DataPart> data = getByteData();
+            Map<String, DataPart[]> data = getByteData();
             if (data != null && data.size() > 0) {
                 dataParse(dos, data);
             }
@@ -82,7 +82,7 @@ public class MultipartRequest extends Request<NetworkResponse> {
         return null;
     }
 
-    protected Map<String, DataPart> getByteData() throws AuthFailureError {
+    protected Map<String, DataPart[]> getByteData() throws AuthFailureError {
         return null;
     }
 
@@ -118,8 +118,8 @@ public class MultipartRequest extends Request<NetworkResponse> {
         }
     }
 
-    private void dataParse(DataOutputStream dataOutputStream, Map<String, DataPart> data) throws IOException {
-        for (Map.Entry<String, DataPart> entry : data.entrySet()) {
+    private void dataParse(DataOutputStream dataOutputStream, Map<String, DataPart[]> data) throws IOException {
+        for (Map.Entry<String, DataPart[]> entry : data.entrySet()) {
             buildDataPart(dataOutputStream, entry.getValue(), entry.getKey());
         }
     }
@@ -133,64 +133,73 @@ public class MultipartRequest extends Request<NetworkResponse> {
     }
 
 
-    private void buildDataPart(DataOutputStream dataOutputStream, DataPart dataFile, String inputName) throws IOException {
-        dataOutputStream.writeBytes(twoHyphens + boundary + lineEnd);
-        dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"" +
-                inputName + "\"; filename=\"" + dataFile.getFileName() + "\"" + lineEnd);
-        if (dataFile.getType() != null && !dataFile.getType().trim().isEmpty()) {
-            dataOutputStream.writeBytes("Content-Type: " + dataFile.getType() + lineEnd);
+    private void buildDataPart(DataOutputStream dataOutputStream, DataPart[] dataFile, String inputName) throws IOException {
+        for (DataPart dataPart : dataFile) {
+            dataOutputStream.writeBytes(twoHyphens + boundary + lineEnd);
+            dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"" +
+                    inputName + "\"; filename=\"" + dataPart.getFileName() + "\"" + lineEnd);
+            if (dataPart.getType() != null && !dataPart.getType().trim().isEmpty()) {
+                dataOutputStream.writeBytes("Content-Type: " + dataPart.getType() + lineEnd);
+            }
+            dataOutputStream.writeBytes(lineEnd);
+            ByteArrayInputStream fileInputStream = new ByteArrayInputStream(dataPart.getContent());
+            int bytesAvailable = fileInputStream.available();
+
+            int maxBufferSize = 1024 * 1024;
+            int bufferSize = Math.min(bytesAvailable, maxBufferSize);
+            byte[] buffer = new byte[bufferSize];
+
+            int bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+            while (bytesRead > 0) {
+                dataOutputStream.write(buffer, 0, bufferSize);
+                bytesAvailable = fileInputStream.available();
+                bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+            }
+            dataOutputStream.writeBytes(lineEnd);
         }
-        dataOutputStream.writeBytes(lineEnd);
-
-        ByteArrayInputStream fileInputStream = new ByteArrayInputStream(dataFile.getContent());
-        int bytesAvailable = fileInputStream.available();
-
-        int maxBufferSize = 1024 * 1024;
-        int bufferSize = Math.min(bytesAvailable, maxBufferSize);
-        byte[] buffer = new byte[bufferSize];
-
-        int bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-
-        while (bytesRead > 0) {
-            dataOutputStream.write(buffer, 0, bufferSize);
-            bytesAvailable = fileInputStream.available();
-            bufferSize = Math.min(bytesAvailable, maxBufferSize);
-            bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-        }
-
-        dataOutputStream.writeBytes(lineEnd);
     }
 
     public class DataPart {
         private String fileName;
         private byte[] content;
         private String type;
+
         public DataPart() {
         }
+
         public DataPart(String name, byte[] data) {
             fileName = name;
             content = data;
         }
+
         public DataPart(String name, byte[] data, String mimeType) {
             fileName = name;
             content = data;
             type = mimeType;
         }
+
         public String getFileName() {
             return fileName;
         }
+
         public void setFileName(String fileName) {
             this.fileName = fileName;
         }
+
         public byte[] getContent() {
             return content;
         }
+
         public void setContent(byte[] content) {
             this.content = content;
         }
+
         public String getType() {
             return type;
         }
+
         public void setType(String type) {
             this.type = type;
         }

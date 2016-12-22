@@ -11,4 +11,5 @@
     <string name="RegSuccessRegister">Congratulations! Data registration was successfully sent to the server.</string>
     <string name="link"><a href="http://thinker-codeart.44fs.preview.openshiftapps.com/">thinker</a> is the service which help you remember your ideas</string>
     <string name="CreateIdea">Create new idea</string>
+    <string name="selectPhoto">Select photo</string>
 </resources>
