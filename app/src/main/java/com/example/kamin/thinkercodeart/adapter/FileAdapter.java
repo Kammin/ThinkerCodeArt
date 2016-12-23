@@ -35,10 +35,16 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.MainViewHolder
     @Override
     public MainViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
-            case TYPE_DIRECTORY:
-                return new DirectoryHolder(LayoutInflater.from(context).inflate(R.layout.item_dir, parent, false));
-            case TYPE_PHOTO:
-                return new PhotoHolder(LayoutInflater.from(context).inflate(R.layout.item_photo, parent, false));
+            case TYPE_DIRECTORY:{
+
+                View v = LayoutInflater.from(context).inflate(R.layout.item_dir, parent, false);
+                v.setMinimumHeight(100);
+                return new DirectoryHolder(v);}
+            case TYPE_PHOTO: {
+                View vp = LayoutInflater.from(context).inflate(R.layout.item_photo, parent, false);
+                vp.setMinimumHeight(100);
+                return new PhotoHolder(vp);
+            }
         }
         return null;
     }
@@ -48,7 +54,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.MainViewHolder
         if (holder.getItemViewType() == TYPE_DIRECTORY) {
             DirectoryHolder dirHolder = (DirectoryHolder) holder;
             dirHolder.ivDir.setImageDrawable(context.getResources().getDrawable(R.mipmap.folder));
-            dirHolder.tvDirName.setText("name");
+            dirHolder.tvDirName.setText("Nameameame");
         }
         if (holder.getItemViewType() == TYPE_PHOTO) {
             PhotoHolder fileHolder = (PhotoHolder) holder;
@@ -67,6 +73,11 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.MainViewHolder
 
         public PhotoHolder(View v) {
             super(v);
+            ViewGroup.LayoutParams params=v.getLayoutParams();
+            //Log.d(TAG,"v.getLayoutParams().width "+v.getWidth());
+            params.width=240;
+            params.height=240;
+            v.setLayoutParams(params);
             this.ivIcon = (ImageView) v.findViewById(R.id.ivIcon);
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -83,8 +94,13 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.MainViewHolder
 
         public DirectoryHolder(View v) {
             super(v);
+            ViewGroup.LayoutParams params=v.getLayoutParams();
+            params.width=240;
+            params.height=240;
+            v.setLayoutParams(params);
             this.tvDirName = (TextView) v.findViewById(R.id.tvDirName);
             this.ivDir = (ImageView) v.findViewById(R.id.ivDir);
+
         }
     }
 

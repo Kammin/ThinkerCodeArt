@@ -4,13 +4,21 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorHashTag"
+    android:layout_margin="0dp"
+    android:id="@+id/llPhoto"
+
     >
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:srcCompat="@mipmap/empty"
         android:id="@+id/ivIcon"
+        android:layout_gravity="center"
+        android:gravity="center"
+
+        android:scaleType="centerCrop"
         android:layout_weight="1"/>
 
 

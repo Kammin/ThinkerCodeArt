@@ -156,7 +156,6 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
                 }
             });
         }
-        //System.gc();
 
     }
 
