@@ -13,15 +13,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 
 import com.example.kamin.thinkercodeart.R;
 import com.example.kamin.thinkercodeart.adapter.FileAdapter;
-import com.example.kamin.thinkercodeart.util.GridAutofitLayoutManager;
 
 import java.io.File;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.R.attr.columnWidth;
 
@@ -31,7 +35,11 @@ public class FileManagerActivity extends AppCompatActivity {
     Context context;
     File[] listDir;
     File dir;
-    GridAutofitLayoutManager gridLayoutManager;
+    int widthHeightItem = 200;
+    int itemMargin = 2;
+    boolean hasParent=false;
+
+
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -79,24 +87,29 @@ public class FileManagerActivity extends AppCompatActivity {
             listDir = dir.listFiles();
             fillAdapter();
         }
-
     }
 
-    void fillAdapter(){
-        FileAdapter fileAdapter = new FileAdapter(this, listDir);
+    void fillAdapter() {
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int countColumn = (metrics.widthPixels / widthHeightItem);
+        int winthItem = (metrics.widthPixels / countColumn);
+        ArrayList<File> prepListDir = new ArrayList<>();
+        if(dir.getParentFile()!=null)
+            hasParent = true;
+            prepListDir.add(dir.getParentFile());
+        for(File file:listDir){
+           if (file.isDirectory())
+            prepListDir.add(file);
+        }
+        for(File file:listDir){
+            if (isImage(file.getName()))
+                prepListDir.add(file);
+        }
+        listDir= prepListDir.toArray(new File[prepListDir.size()]);
+        FileAdapter fileAdapter = new FileAdapter(this, listDir, winthItem, hasParent);
         RecyclerView fileRecyclerView = (RecyclerView) findViewById(R.id.file_recycler_view);
-
-        //RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 4);
-       // gridLayoutManager = new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL);
-        //gridLayoutManager.setAutoMeasureEnabled(true);
-        int columns = 3;
-        GridLayoutManager layoutManager = new GridLayoutManager(this,columns);
-
-        Log.d(TAG,"columnWidth "+columnWidth);
-        Log.d(TAG,"columnWidth "+context.getResources().getDisplayMetrics().widthPixels);
-       // gridLayoutManager.setMeasuredDimension(100,100);
-        //fileRecyclerView.setHasFixedSize(true);
-       // gridLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, countColumn);
         fileRecyclerView.setLayoutManager(layoutManager);
         fileRecyclerView.setAdapter(fileAdapter);
     }
