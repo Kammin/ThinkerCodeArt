@@ -25,7 +25,6 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.example.kamin.thinkercodeart.R;
 import com.example.kamin.thinkercodeart.adapter.IdeaAdapter;
 import com.example.kamin.thinkercodeart.model.Idea;
-import com.example.kamin.thinkercodeart.util.AlertDialogActivity;
 import com.example.kamin.thinkercodeart.util.URLs;
 import com.example.kamin.thinkercodeart.volley.Singleton;
 

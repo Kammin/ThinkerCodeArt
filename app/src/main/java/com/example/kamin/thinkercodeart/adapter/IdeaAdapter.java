@@ -61,27 +61,15 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
 
 
     @Override
-    public void onViewDetachedFromWindow(IdeaViewHolder holder) {
-        //Log.d(TAG,"Detached From Window "+holder.nameIdea.getText());
-        super.onViewDetachedFromWindow(holder);
-    }
-
-    @Override
-    public void onViewAttachedToWindow(IdeaViewHolder holder) {
-        super.onViewAttachedToWindow(holder);
-        //Log.d("TAG","Attached To Window "+holder.nameIdea.getText());
-    }
-
-    @Override
     public IdeaAdapter.IdeaViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Log.d(TAG,"viewType "+viewType);
+        Log.d(TAG, "viewType " + viewType);
         View view = LayoutInflater.from(parent.getContext()).inflate(rowLayout, parent, false);
         return new IdeaViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(IdeaAdapter.IdeaViewHolder holder, int position) {
-        Log.d(TAG,"onBindViewHolder "+position);
+        Log.d(TAG, "onBindViewHolder " + position);
         holder.nameIdea.setText(ideas.get(position).getName());
         holder.bodyIdea.setText(ideas.get(position).getBodyIdea());
         holder.author.setText(ideas.get(position).getUsername());
@@ -162,5 +150,4 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
     public int getItemCount() {
         return ideas.size();
     }
-
 }

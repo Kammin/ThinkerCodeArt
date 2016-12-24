@@ -61,7 +61,7 @@ public class FileManagerActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
-            listDir = dir.listFiles();
+
             fillAdapter(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + File.separator + "Camera");
             if (HolderData.selectedPfoto != null) {
                 fillSelectedFilesAdapter();

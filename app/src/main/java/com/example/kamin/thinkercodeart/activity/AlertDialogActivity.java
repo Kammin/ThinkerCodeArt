@@ -1,4 +1,4 @@
-package com.example.kamin.thinkercodeart.util;
+package com.example.kamin.thinkercodeart.activity;
 
 import android.app.Activity;
 import android.os.Bundle;

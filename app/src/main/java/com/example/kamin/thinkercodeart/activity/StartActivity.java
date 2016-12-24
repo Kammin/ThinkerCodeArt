@@ -30,7 +30,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.StringRequest;
 import com.example.kamin.thinkercodeart.R;
-import com.example.kamin.thinkercodeart.util.AlertDialogActivity;
 import com.example.kamin.thinkercodeart.util.URLs;
 import com.example.kamin.thinkercodeart.volley.Singleton;
 

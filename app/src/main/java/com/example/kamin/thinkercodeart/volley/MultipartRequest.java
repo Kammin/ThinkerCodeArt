@@ -82,7 +82,7 @@ public class MultipartRequest extends Request<NetworkResponse> {
         return null;
     }
 
-    protected Map<String, DataPart[]> getByteData() throws AuthFailureError {
+    protected Map<String, DataPart[]> getByteData() throws AuthFailureError, IOException {
         return null;
     }
 

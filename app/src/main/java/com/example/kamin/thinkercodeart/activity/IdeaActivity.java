@@ -24,13 +24,18 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.example.kamin.thinkercodeart.R;
+import com.example.kamin.thinkercodeart.util.HolderData;
 import com.example.kamin.thinkercodeart.util.URLs;
 import com.example.kamin.thinkercodeart.volley.MultipartRequest;
 import com.example.kamin.thinkercodeart.volley.Singleton;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
 
 
 public class IdeaActivity extends AppCompatActivity {
@@ -111,11 +116,13 @@ public class IdeaActivity extends AppCompatActivity {
             }
 
             @Override
-            protected Map<String, DataPart[]> getByteData() {
+            protected Map<String, DataPart[]> getByteData() throws IOException {
                 Map<String, DataPart[]> params = new HashMap<>();
-                DataPart[] dataParts = new DataPart[2];
-                dataParts[0] = new DataPart("file_avatar.jpg", getFileDataFromDrawable(getBaseContext(), R.mipmap.android), "image/jpeg");
-                dataParts[1] = new DataPart("file_avatar.jpg", getFileDataFromDrawable(getBaseContext(), R.mipmap.empty_avatar), "image/jpeg");
+                DataPart[] dataParts = new DataPart[HolderData.selectedPfoto.size()];
+
+                dataParts[0] = new DataPart("file_avatar.jpg", FileUtils.readFileToByteArray(HolderData.selectedPfoto.get(0)), "image/jpeg");
+                dataParts[1] = new DataPart("file_avatar.jpg", FileUtils.readFileToByteArray(HolderData.selectedPfoto.get(1)), "image/jpeg");
+
                 params.put("files", dataParts);
                 return params;
             }
