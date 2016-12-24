@@ -2,10 +2,12 @@ package com.example.kamin.thinkercodeart.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +18,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -32,7 +35,7 @@ import java.util.Map;
 
 public class IdeaActivity extends AppCompatActivity {
     final static public String TAG = StartActivity.class.getSimpleName();
-    String name, body, tags;
+    String name, body, tags, auth;
     Context context;
     EditText etName, etBody, etTags;
     @Override
@@ -47,6 +50,8 @@ public class IdeaActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(R.string.CreateIdea);
         toolbar.setTitleMargin(0,0,0,0);
 
+        SharedPreferences sPref = PreferenceManager.getDefaultSharedPreferences(this);
+        auth = sPref.getString(getResources().getString(R.string.AUTH), "");
         etName = (EditText) findViewById(R.id.etName);
         etBody = (EditText) findViewById(R.id.etBody);
         etTags = (EditText) findViewById(R.id.etTags);
@@ -80,7 +85,7 @@ public class IdeaActivity extends AppCompatActivity {
             public void onResponse(NetworkResponse response) {
                 String resultResponse = new String(response.data);
                 // parse success output
-                Log.d(TAG,"resultResponse "+resultResponse);
+                Log.d(TAG,"resultResponse networkTimeMs"+response.networkTimeMs);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -101,7 +106,7 @@ public class IdeaActivity extends AppCompatActivity {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization", "Basic a2FtaW46a2Ft");
+                headers.put("Authorization", "Basic "+auth);
                 return headers;
             }
 
@@ -115,7 +120,7 @@ public class IdeaActivity extends AppCompatActivity {
                 return params;
             }
         };
-
+        multipartRequest.setRetryPolicy(new DefaultRetryPolicy(20000,1,DefaultRetryPolicy.DEFAULT_MAX_RETRIES));
         Singleton.getInstance(getBaseContext()).addToRequestQueue(multipartRequest);
     }
     public static byte[] getFileDataFromDrawable(Context context, int id) {

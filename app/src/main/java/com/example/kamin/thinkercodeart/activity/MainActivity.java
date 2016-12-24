@@ -18,14 +18,12 @@ import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import com.android.volley.Cache;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.example.kamin.thinkercodeart.R;
 import com.example.kamin.thinkercodeart.adapter.IdeaAdapter;
-import com.example.kamin.thinkercodeart.model.Author;
 import com.example.kamin.thinkercodeart.model.Idea;
 import com.example.kamin.thinkercodeart.util.AlertDialogActivity;
 import com.example.kamin.thinkercodeart.util.URLs;
@@ -35,7 +33,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,30 +93,11 @@ public class MainActivity extends AppCompatActivity {
     void feedIdeas() {
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
-        Cache cache = Singleton.getInstance(this).getRequestQueue().getCache();
-        Cache.Entry entry = cache.get(URLs.IDEAS);
-        if (entry != null) {
-            // fetch the data from cache
-            try {
-                String data = new String(entry.data, "UTF-8");
-                try {
-                    parseJsonFeed(new JSONArray(data));
-                    progressBar.setVisibility(View.GONE);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-
-        } else {
-            // making fresh volley request and getting json
             JsonArrayRequest jsonReq = new JsonArrayRequest(Request.Method.GET,
                     URLs.IDEAS, null, new com.android.volley.Response.Listener<JSONArray>() {
-
                 @Override
                 public void onResponse(JSONArray response) {
-                    VolleyLog.d(TAG, "Response: " + response.toString());
+                    Log.d(TAG, "Response: " + response.toString());
                     if (response != null) {
                         Log.d(TAG, "response length = " + response.length());
                         Singleton.getInstance(getApplicationContext()).ideas = new ArrayList<>();
@@ -130,18 +108,18 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }, new com.android.volley.Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    VolleyLog.d(TAG, "Error: " + error.getNetworkTimeMs() + "  " + error.toString());
+                    Log.d(TAG, "Error: " + error.getNetworkTimeMs() + "  " + error.toString());
                     progressBar.setVisibility(View.GONE);
                 }
             });
             // Adding request to volley request queue
+            jsonReq.setRetryPolicy(new DefaultRetryPolicy(10000,3,DefaultRetryPolicy.DEFAULT_MAX_RETRIES));
             Singleton.getInstance(this).addToRequestQueue(jsonReq);
         }
 
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -154,21 +132,18 @@ public class MainActivity extends AppCompatActivity {
      * Parsing json reponse and passing the data to feed view list adapter
      */
     private void parseJsonFeed(JSONArray response) {
-
+        Log.d(TAG,"array lenght "+response.length());
         for (int i = 0; i < response.length(); i++) {
+
             try {
                 JSONObject obj = response.getJSONObject(i);
                 Idea idea = new Idea();
                 idea.setIdeaId(obj.getString("ideaId"));
                 idea.setName(obj.getString("name"));
                 idea.setBodyIdea(obj.getString("description"));
+                idea.setUserId(obj.getString("userId"));
+                idea.setUsername(obj.getString("username"));
 
-                Author author = new Author();
-                JSONObject objAuthor = obj.getJSONObject("author");
-                author.setUserId(objAuthor.getString("userId"));
-                author.setEmail(objAuthor.getString("email"));
-                author.setUsername(objAuthor.getString("username"));
-                idea.setAuthor(author);
 
                 JSONArray objFiles = obj.getJSONArray("files");
                 List<String> files = new ArrayList<>();
@@ -186,6 +161,10 @@ public class MainActivity extends AppCompatActivity {
                 }
                 idea.setTags(tags);
 
+                idea.setLikes(obj.getInt("likes"));
+                idea.setDislikes(obj.getInt("dislikes"));
+                idea.setUserLikeStatus(obj.getInt("userLikeStatus"));
+
                 Singleton.getInstance(this).ideas.add(idea);
 
             } catch (JSONException e) {
@@ -199,9 +178,10 @@ public class MainActivity extends AppCompatActivity {
     void logOut() {
         SharedPreferences.Editor ed = sPref.edit();
         ed.putString(getResources().getString(R.string.ACTIVE_USER), "");
+        ed.putString(getResources().getString(R.string.AUTH), "");
         ed.commit();
+        Singleton.getInstance(this).ideas = null;
         String ActiveUser = sPref.getString(getResources().getString(R.string.ACTIVE_USER), "");
-        Log.d(TAG, "logOut |" + ActiveUser + "|");
         Log.d(TAG, "logOut");
         Intent intent = new Intent(this, StartActivity.class);
         startActivity(intent);

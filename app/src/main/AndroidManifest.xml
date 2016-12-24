@@ -17,11 +17,6 @@
 
         <activity android:name=".activity.MainActivity"></activity>
         <activity android:name=".activity.FileManagerActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
      <!--       android:theme="@style/Theme.AppCompat.DayNight.Dialog.Alert">-->
         </activity>
 
@@ -38,7 +33,11 @@
     <activity
         android:name=".activity.StartActivity"
         android:windowSoftInputMode="adjustPan">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
 
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
     </activity>
 </application>
 

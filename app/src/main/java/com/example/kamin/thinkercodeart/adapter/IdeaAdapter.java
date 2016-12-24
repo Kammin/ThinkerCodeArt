@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -85,7 +84,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
         Log.d(TAG,"onBindViewHolder "+position);
         holder.nameIdea.setText(ideas.get(position).getName());
         holder.bodyIdea.setText(ideas.get(position).getBodyIdea());
-        holder.author.setText(ideas.get(position).getAuthor().getUsername());
+        holder.author.setText(ideas.get(position).getUsername());
         holder.date.setText(DateFormat.format("dd.MM.yyyy", ideas.get(position).getDate()).toString());
         List<String> tags = ideas.get(position).getTags();
         holder.parentLLforTags.removeAllViews();
@@ -105,7 +104,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
         }
         List<String> photos = ideas.get(position).getFiles();
 
-        String avatarURL = URLs.USERS.concat("/" + ideas.get(position).getAuthor().getUserId() + "/avatar");
+/*        String avatarURL = URLs.USERS.concat("/" + ideas.get(position).getAuthor().getUserId() + "/avatar");
         final ImageView imageViewavatar = holder.avatar;
         ImageLoader.ImageContainer containerAvatar = Singleton.getInstance(context).getImageLoader().get(avatarURL, new ImageLoader.ImageListener() {
             @Override
@@ -131,7 +130,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
             public void onErrorResponse(VolleyError error) {
 
             }
-        });
+        });*/
         final ImageView imageView = holder.cover;
         if (photos.size() != 0) {
             final ProgressBar progressBarPhoto = holder.progressBarPhoto;

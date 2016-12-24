@@ -3,6 +3,7 @@
     <color name="colorPrimary">#505f61</color>
     <color name="colorPrimaryAlpha">#88505f61</color>
     <color name="colorPrimaryAlpha2">#505f61</color>
+    <color name="colorPrimaryAlpha3">#36969696</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#3d494b</color>
     <color name="colorOrange">#ff9d00</color>

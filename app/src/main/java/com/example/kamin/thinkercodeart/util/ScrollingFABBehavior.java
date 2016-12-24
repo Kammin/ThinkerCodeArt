@@ -8,10 +8,6 @@ import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
-/**
- * Created by Kamin on 12.12.2016.
- */
-
 
 public class ScrollingFABBehavior extends CoordinatorLayout.Behavior<FloatingActionButton> {
     private int toolbarHeight;

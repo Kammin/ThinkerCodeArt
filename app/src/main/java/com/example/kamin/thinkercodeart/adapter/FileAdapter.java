@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.kamin.thinkercodeart.R;
 import com.example.kamin.thinkercodeart.activity.FileManagerActivity;
 
@@ -68,6 +69,11 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.MainViewHolder
         if (holder.getItemViewType() == TYPE_PHOTO) {
             PhotoHolder fileHolder = (PhotoHolder) holder;
             fileHolder.ivIcon.setImageDrawable(context.getResources().getDrawable(R.mipmap.emptyphoto2));
+            Glide.with(context)
+                    .load(fileArray[position])
+                    .crossFade(5)
+                    .override(itemWidth,itemWidth)
+                    .into(fileHolder.ivIcon);
         }
     }
 

@@ -6,8 +6,6 @@ public class URLs {
     public static final String IDEAS = BASE.concat("/restapi/ideas");
     public static final String IDEAS_ADD_FILES = BASE.concat("/restapi/ideas/wfiles");
     public static final String USERS = BASE.concat("/restapi/users");
-    public static final String LOGIN = BASE.concat("/login");
-
-
+    public static final String LOGIN = BASE.concat("/login/json");
 
 }

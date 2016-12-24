@@ -17,10 +17,10 @@
         app:titleTextColor="@color/colorOrange">
     <ImageButton
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         app:srcCompat="@drawable/ic_arrow_back_24dp"
         android:background="@android:color/transparent"
-        android:id="@+id/imageButton"
+        android:id="@+id/backButton"
         android:onClick="onClickBack"/>
         <TextView
             android:text="@string/selectPhoto"
@@ -30,29 +30,32 @@
             android:layout_gravity="right"
             android:layout_marginRight="15dp"
             android:textSize="20dp"
-            android:id="@+id/textView" />
+            android:id="@+id/selectPhoto" />
 
     </android.support.v7.widget.Toolbar>
-
 
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/pic_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="77dp"
-        android:scrollbars="horizontal" />
+        android:layout_height="@dimen/SelectFileHeight"
+        android:scrollbars="horizontal"
+        android:background="@color/colorWhite"
+        />
 
-    <Button
-        android:text="Button"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/button2" />
+        android:background="@color/colorPrimary"
+        android:layout_height="10dp"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/file_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical" />
+        android:scrollbars="vertical" >
+
+    </android.support.v7.widget.RecyclerView>
 
 
 </LinearLayout>

@@ -8,6 +8,8 @@
     <dimen name="textSize_date">10dp</dimen>
     <dimen name="textSize_like">15dp</dimen>
     <dimen name="LikeSize">20dp</dimen>
+    <dimen name="SelectFileHeight">100dp</dimen>
+
 
     <dimen name="imageSize">100dp</dimen>
 

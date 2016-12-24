@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -21,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -41,6 +43,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+
 
 public class StartActivity extends AppCompatActivity {
     TextView tvLogin, tvSignup, btSigin, btSigup;
@@ -123,8 +126,11 @@ public class StartActivity extends AppCompatActivity {
         inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
         if (!checkConnection())
             return;
-        String[] params = new String[]{etLogin.getText().toString(), etPass.getText().toString()};
-        new PostClass(this).execute(params);
+        username = etLogin.getText().toString();
+        password = etPass.getText().toString();
+        loginUser();
+        //String[] params = new String[]{etLogin.getText().toString(), etPass.getText().toString()};
+        //new PostClass(this).execute(params);
 
     }
 
@@ -154,8 +160,16 @@ public class StartActivity extends AppCompatActivity {
 
 
     void login() {
+        String auth = username+":"+password;
+        byte[] encoding = Base64.encode(auth.getBytes(),Base64.DEFAULT);
+        try {
+            auth = new String(encoding, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         SharedPreferences.Editor ed = sPref.edit();
         ed.putString(getResources().getString(R.string.ACTIVE_USER), etLogin.getText().toString());
+        ed.putString(getResources().getString(R.string.AUTH), auth);
         ed.commit();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
@@ -172,17 +186,190 @@ public class StartActivity extends AppCompatActivity {
     Boolean checkConnection() {
         ConnectivityManager cm =
                 (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        Log.d(TAG, "NoConnection... ");
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
         if (!isConnected) {
-            Log.d(TAG, "NoConnection... ");
             Intent intent = new Intent(this, AlertDialogActivity.class);
             intent.putExtra("MESSAGE", getResources().getString(R.string.NoConnection));
             startActivity(intent);
         }
         return isConnected;
     }
+
+
+
+    void registerNewUser() {
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("username", username);
+            jsonBody.put("email", email);
+            jsonBody.put("password", password);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        final String requestBody = jsonBody.toString();
+        Log.d(TAG, requestBody);
+        StringRequest jsonReq = new StringRequest(Request.Method.POST,
+                URLs.USERS, new com.android.volley.Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                VolleyLog.d(TAG, "Response: " + response.toString());
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                NetworkResponse networkResponse = error.networkResponse;
+                if (networkResponse != null && networkResponse.statusCode != 201){
+                    Log.d(TAG, "networkResponse.statusCode " + networkResponse.statusCode);
+                            Intent intent = new Intent(context, AlertDialogActivity.class);
+                            intent.putExtra("MESSAGE", getResources().getString(R.string.RegFailedRegister));
+                            startActivity(intent);
+                }
+                VolleyLog.d(TAG, "Error: " + "  " + error.toString());
+            }
+        }) {
+            @Override
+            protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                Log.d(TAG, "NetworkResponse " + response.statusCode);
+                if (response.statusCode == 201) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            onClickLogin(null);
+                            etLogin.setText(username);
+                            etPass.setText(password);
+                            Intent intent = new Intent(context, AlertDialogActivity.class);
+                            intent.putExtra("MESSAGE", getResources().getString(R.string.RegSuccessRegister));
+                            startActivity(intent);
+                        }
+                    });
+                }
+                return super.parseNetworkResponse(response);
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                try {
+                    return requestBody == null ? null : requestBody.getBytes("utf-8");
+                } catch (UnsupportedEncodingException uee) {
+                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+                    return null;
+                }
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/json");
+                headers.put("dataType", "TEXT");
+                headers.put("async", "true");
+                return headers;
+            }
+
+        };
+        // Adding request to volley request queue
+        Singleton.getInstance(this).addToRequestQueue(jsonReq);
+    }
+
+
+
+
+
+
+
+    void loginUser() {
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("username", username);
+            jsonBody.put("password", password);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        final String requestBody = jsonBody.toString();
+        Log.d(TAG, requestBody);
+        StringRequest jsonReq = new StringRequest(Request.Method.POST,
+                URLs.LOGIN, new com.android.volley.Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, "NetworkResponse " + response.toString());
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                NetworkResponse networkResponse = error.networkResponse;
+                if (networkResponse != null && networkResponse.statusCode != 200){
+                    Log.d(TAG, "networkResponse.statusCode " + networkResponse.statusCode);
+                    error();
+                }
+                VolleyLog.d(TAG, "Error: " + "  " + error.toString());
+            }
+        }) {
+
+            @Override
+            protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                Log.d(TAG, "NetworkResponse " + response.statusCode);
+                if (response.statusCode == 200) {
+                    login();
+                }
+                return super.parseNetworkResponse(response);
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                try {
+                    return requestBody == null ? null : requestBody.getBytes("utf-8");
+                } catch (UnsupportedEncodingException uee) {
+                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+                    return null;
+                }
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/json");
+                headers.put("dataType", "TEXT");
+                headers.put("async", "true");
+                return headers;
+            }
+        };
+        // Adding request to volley request queue
+        jsonReq.setRetryPolicy(new DefaultRetryPolicy(10000, 1, 1.0f));
+        Singleton.getInstance(this).addToRequestQueue(jsonReq);
+    }
+
+
+    Boolean checkInputData() {
+        Intent intent = new Intent(this, AlertDialogActivity.class);
+        if ((username.equals("")) | (email.equals("")) | (password.equals("")) | (confirm.equals(""))) {
+            intent.putExtra("MESSAGE", getResources().getString(R.string.RegEmptyFields));
+            startActivity(intent);
+            return false;
+        }
+        if (!(email.contains("@")) | !(email.contains("."))) {
+            intent.putExtra("MESSAGE", getResources().getString(R.string.RegIncorrectEmail));
+            startActivity(intent);
+            return false;
+        }
+        if (!(password.equals(confirm))) {
+            intent.putExtra("MESSAGE", getResources().getString(R.string.RegIncorrectConfirmation));
+            startActivity(intent);
+            return false;
+        }
+
+        return true;
+    }
+
 
     private class PostClass extends AsyncTask<String[], Void, Void> {
         private final Context context;
@@ -256,97 +443,5 @@ public class StartActivity extends AppCompatActivity {
 
             return null;
         }
-    }
-
-    void registerNewUser() {
-        JSONObject jsonBody = new JSONObject();
-        try {
-            jsonBody.put("username", username);
-            jsonBody.put("email", email);
-            jsonBody.put("password", password);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        final String requestBody = jsonBody.toString();
-        Log.d(TAG, requestBody);
-        StringRequest jsonReq = new StringRequest(Request.Method.POST,
-                URLs.USERS, new com.android.volley.Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                VolleyLog.d(TAG, "Response: " + response.toString());
-            }
-        }, new com.android.volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Error: " + "  " + error.toString());
-            }
-        }) {
-            @Override
-            protected Response<String> parseNetworkResponse(NetworkResponse response) {
-                Log.d(TAG, "NetworkResponse " + response.statusCode);
-                if (response.statusCode == 200) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            onClickLogin(null);
-                            etLogin.setText(username);
-                            etPass.setText(password);
-                            Intent intent = new Intent(context, AlertDialogActivity.class);
-                            intent.putExtra("MESSAGE", getResources().getString(R.string.RegSuccessRegister));
-                            startActivity(intent);
-                        }
-                    });
-                }
-                return super.parseNetworkResponse(response);
-            }
-
-            @Override
-            public String getBodyContentType() {
-                return "application/json; charset=utf-8";
-            }
-
-            @Override
-            public byte[] getBody() throws AuthFailureError {
-                try {
-                    return requestBody == null ? null : requestBody.getBytes("utf-8");
-                } catch (UnsupportedEncodingException uee) {
-                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
-                    return null;
-                }
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Content-Type", "application/json");
-                headers.put("dataType", "TEXT");
-                headers.put("async", "true");
-                return headers;
-            }
-
-        };
-        // Adding request to volley request queue
-        Singleton.getInstance(this).addToRequestQueue(jsonReq);
-    }
-
-    Boolean checkInputData() {
-        Intent intent = new Intent(this, AlertDialogActivity.class);
-        if ((username.equals("")) | (email.equals("")) | (password.equals("")) | (confirm.equals(""))) {
-            intent.putExtra("MESSAGE", getResources().getString(R.string.RegEmptyFields));
-            startActivity(intent);
-            return false;
-        }
-        if (!(email.contains("@")) | !(email.contains("."))) {
-            intent.putExtra("MESSAGE", getResources().getString(R.string.RegIncorrectEmail));
-            startActivity(intent);
-            return false;
-        }
-        if (!(password.equals(confirm))) {
-            intent.putExtra("MESSAGE", getResources().getString(R.string.RegIncorrectConfirmation));
-            startActivity(intent);
-            return false;
-        }
-
-        return true;
     }
 }
