@@ -41,6 +41,7 @@
                 android:gravity="center_vertical"
                 android:text="Author Author"
                 android:textSize="@dimen/textSize_author"
+                android:onClick="search"
                 android:textStyle="bold" />
 
             <TextView

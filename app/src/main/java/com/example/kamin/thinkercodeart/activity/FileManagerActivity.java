@@ -2,6 +2,7 @@ package com.example.kamin.thinkercodeart.activity;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -48,6 +49,7 @@ public class FileManagerActivity extends AppCompatActivity {
     RecyclerView fileRecyclerView, selectRecyclerView;
     FileManagerActivity fileManagerActivity = this;
     String path;
+    long length=0;
     SharedPreferences sPref;
     ImageButton backButton;
     TextView selectPhoto;
@@ -62,7 +64,7 @@ public class FileManagerActivity extends AppCompatActivity {
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
 
-            fillAdapter(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + File.separator + "Camera");
+            fillAdapter(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath());
             if (HolderData.selectedPfoto != null) {
                 fillSelectedFilesAdapter();
             }
@@ -90,7 +92,7 @@ public class FileManagerActivity extends AppCompatActivity {
         if (!path.equals(""))
             Log.d(TAG, "PATH commit " + path);
         if (path == "") {
-            path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + File.separator + "Camera";
+            path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();
             if (!new File(path).exists())
                 path = "/";
         }
@@ -171,17 +173,25 @@ public class FileManagerActivity extends AppCompatActivity {
                         {
                             if (HolderData.selectedPfoto == null)
                                 HolderData.selectedPfoto = new ArrayList<>();
-                                Collections.reverse(HolderData.selectedPfoto);
-                                HolderData.selectedPfoto.add(listDir[position]);
-                                Collections.reverse(HolderData.selectedPfoto);
-                                fillSelectedFilesAdapter();
-                            }
-/*                            else{
+                            if(HolderData.selectedPfoto.size()<HolderData.MaxPhotoCount){
+                                if ((length + listDir[position].length()) < HolderData.MaxWeithPhotoArray) {
+                                    Collections.reverse(HolderData.selectedPfoto);
+                                    HolderData.selectedPfoto.add(listDir[position]);
+                                    Collections.reverse(HolderData.selectedPfoto);
+                                    fillSelectedFilesAdapter();
+                                } else {
+                                    Intent intent = new Intent(context, AlertDialogActivity.class);
+                                    intent.putExtra("MESSAGE", getResources().getString(R.string.ExceedingWeight));
+                                    startActivity(intent);
+                                }
+                            }else
+                            {
                                 Intent intent = new Intent(context, AlertDialogActivity.class);
-                                intent.putExtra("MESSAGE", getResources().getString(R.string.txceedingWeight));
+                                intent.putExtra("MESSAGE", getResources().getString(R.string.ExceedingCount));
                                 startActivity(intent);
-                            }*/
+                            }
 
+                        }
                     }
 
                     @Override
@@ -198,10 +208,8 @@ public class FileManagerActivity extends AppCompatActivity {
                         HolderData.selectedPfoto.remove(position);
                         fillSelectedFilesAdapter();
                     }
-
                     @Override
                     public void onLongItemClick(View view, int position) {
-
                     }
                 })
         );
@@ -215,8 +223,12 @@ public class FileManagerActivity extends AppCompatActivity {
             selectRecyclerView.setLayoutManager(layoutManager);
             selectRecyclerView.setAdapter(selectFileAdapter);
             if(selectedPhoto.length>0) {
+                length=0;
+                for(File file:selectedPhoto){
+                    length += file.length();
+                }
                 backButton.setImageResource(R.drawable.ic_check_black_24dp);
-                selectPhoto.setText(selectedPhoto.length + " " + getResources().getString(R.string.selectPhoto));
+                selectPhoto.setText("("+(length/(1024))+"/"+"Kb)   "+selectedPhoto.length + " " + getResources().getString(R.string.selectPhoto));
             }
             else{
                 backButton.setImageResource(R.drawable.ic_arrow_back_24dp);

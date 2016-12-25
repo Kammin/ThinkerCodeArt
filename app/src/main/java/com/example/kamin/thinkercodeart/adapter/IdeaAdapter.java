@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.example.kamin.thinkercodeart.R;
+import com.example.kamin.thinkercodeart.activity.MainActivity;
 import com.example.kamin.thinkercodeart.model.Idea;
 import com.example.kamin.thinkercodeart.util.URLs;
 import com.example.kamin.thinkercodeart.volley.Singleton;
@@ -29,11 +31,12 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
     private int rowLayout;
     private Context context;
     private static final String TAG = IdeaAdapter.class.getSimpleName();
-
-    public IdeaAdapter(List<Idea> ideas, int rowLayout, Context context) {
+    MainActivity mainActivity;
+    public IdeaAdapter(List<Idea> ideas, int rowLayout, Context context, MainActivity mainActivity) {
         this.ideas = ideas;
         this.rowLayout = rowLayout;
         this.context = context;
+        this.mainActivity = mainActivity;
     }
 
     public class IdeaViewHolder extends RecyclerView.ViewHolder {
@@ -69,6 +72,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
 
     @Override
     public void onBindViewHolder(IdeaAdapter.IdeaViewHolder holder, int position) {
+        final String userID =  ideas.get(position).getUserId();
         Log.d(TAG, "onBindViewHolder " + position);
         holder.nameIdea.setText(ideas.get(position).getName());
         holder.bodyIdea.setText(ideas.get(position).getBodyIdea());
@@ -91,8 +95,14 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
             });
         }
         List<String> photos = ideas.get(position).getFiles();
+        holder.author.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mainActivity.search("author",userID,"");
+            }
+        });
 
-/*        String avatarURL = URLs.USERS.concat("/" + ideas.get(position).getAuthor().getUserId() + "/avatar");
+        String avatarURL = URLs.USERS.concat("/" + ideas.get(position).getUserId() + "/avatar");
         final ImageView imageViewavatar = holder.avatar;
         ImageLoader.ImageContainer containerAvatar = Singleton.getInstance(context).getImageLoader().get(avatarURL, new ImageLoader.ImageListener() {
             @Override
@@ -116,9 +126,9 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
 
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                Log.d(TAG, "error avatar load " + error.networkResponse.statusCode);
             }
-        });*/
+        });
         final ImageView imageView = holder.cover;
         if (photos.size() != 0) {
             final ProgressBar progressBarPhoto = holder.progressBarPhoto;
@@ -150,4 +160,5 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
     public int getItemCount() {
         return ideas.size();
     }
+
 }

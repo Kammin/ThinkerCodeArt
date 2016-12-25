@@ -7,14 +7,19 @@
         android:id="@+id/refresh"
         android:title="Refresh"
         android:icon="@drawable/ic_refresh"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom"
+        />
 
-    <item android:id="@+id/action_User"
+    <item android:id="@+id/action_user"
         android:title="User"
         app:showAsAction="never"/>
 
-    <item android:id="@+id/action_settings"
-        android:title="My Ideas"
+    <item android:id="@+id/action_ideas"
+        android:title="All ideas"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/action_my_ideas"
+        android:title="My ideas"
         app:showAsAction="never"/>
 
     <item android:id="@+id/action_logout"
