@@ -135,6 +135,7 @@ public class IdeaActivity extends AppCompatActivity {
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(),id);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
+
         return byteArrayOutputStream.toByteArray();
     }
 
