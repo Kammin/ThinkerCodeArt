@@ -17,6 +17,7 @@
     <string name="RegFailedRegister">Registration failed. Unfortunately, this login is already in use.</string>
     <string name="IdeaDeleted">Idea successfully deleted.</string>
     <string name="IdeaAdded">Сongratulations, your idea successfully added.</string>
+    <string name="ErrorIdeaAdd">Download the idea failed.</string>
     <string name="link"><a href="http://thinker-codeart.44fs.preview.openshiftapps.com/">thinker</a> is the service which help you remember your ideas</string>
     <string name="CreateIdea">Create new idea</string>
     <string name="selectPhoto">Select photo</string>

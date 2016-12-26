@@ -121,6 +121,9 @@ public class IdeaActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                Intent intent = new Intent(context, AlertDialogActivity.class);
+                intent.putExtra("MESSAGE", getResources().getString(R.string.ErrorIdeaAdd)+" StatusCode "+error.networkResponse.statusCode+" "+error.networkResponse.toString());
+                startActivity(intent);
                 error.printStackTrace();
             }
         }) {

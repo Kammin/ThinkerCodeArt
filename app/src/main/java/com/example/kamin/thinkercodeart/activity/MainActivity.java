@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private int loadForItem = 10;
     String endIdeaID = "";
     IdeaAdapter ideaAdapter;
+    String criteria, content;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,8 +145,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     if (loading.equals(getString(R.string.LoadSerch))) {
                         canLoad = false;
-                        feedIdeas(URLs.IDEAS + "/part/" + endIdeaID, true);
-                        Log.d(TAG, "loading ----  " + URLs.IDEAS + "/part/" + endIdeaID);
+                        search(criteria, content,endIdeaID);
+                        Log.d(TAG, "loading ----  " + URLs.IDEAS + " / " + endIdeaID);
                     }
                 }
 
@@ -174,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                         recyclerView.setAdapter(ideaAdapter);
                     Log.d(TAG, "ideas length = " + Singleton.getInstance(getApplicationContext()).ideas.size());
                     progressBar.setVisibility(View.GONE);
-
+                    canLoad = true;
                 }
             }
 
@@ -297,6 +298,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void search(String criteria, String content, String part) {
+        this.criteria = criteria;
+        this.content = content;
         loading = getResources().getString(R.string.LoadSerch);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
@@ -324,7 +327,6 @@ public class MainActivity extends AppCompatActivity {
                     parseJsonFeed(response);
                     progressBar.setVisibility(View.GONE);
                     ideaAdapter.notifyDataSetChanged();
-
                     canLoad = true;
                 }
             }

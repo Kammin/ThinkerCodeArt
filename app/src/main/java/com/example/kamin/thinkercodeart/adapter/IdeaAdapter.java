@@ -33,9 +33,10 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
     private int rowLayout;
     private Context context;
     String curentUserId;
-    Boolean adminRoot=false;
+    Boolean adminRoot = false;
     private static final String TAG = IdeaAdapter.class.getSimpleName();
     MainActivity mainActivity;
+
     public IdeaAdapter(List<Idea> ideas, int rowLayout, Context context, MainActivity mainActivity) {
         this.ideas = ideas;
         this.rowLayout = rowLayout;
@@ -56,6 +57,8 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
         TextView delete;
         LinearLayout parentLLforTags;
         ProgressBar progressBarPhoto;
+        TextView like;
+        TextView dislike;
 
         public IdeaViewHolder(View itemView) {
             super(itemView);
@@ -68,6 +71,8 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
             delete = (TextView) itemView.findViewById(R.id.deleteIdea);
             parentLLforTags = (LinearLayout) itemView.findViewById(R.id.parentLLforTags);
             progressBarPhoto = (ProgressBar) itemView.findViewById(R.id.progressBarPhoto);
+            like = (TextView) itemView.findViewById(R.id.likeCount);
+            dislike = (TextView) itemView.findViewById(R.id.dislikeCount);
         }
     }
 
@@ -82,21 +87,21 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
     @Override
     public void onBindViewHolder(IdeaAdapter.IdeaViewHolder holder, int position) {
         final int pos = position;
-        final String ideaID= ideas.get(position).getIdeaId();
-        final String userID =  ideas.get(position).getUserId();
+        final String ideaID = ideas.get(position).getIdeaId();
+        final String userID = ideas.get(position).getUserId();
         Log.d(TAG, "onBindViewHolder " + position);
         holder.nameIdea.setText(ideas.get(position).getName());
         holder.bodyIdea.setText(ideas.get(position).getBodyIdea());
         holder.author.setText(ideas.get(position).getUsername());
         holder.date.setText(DateFormat.format("dd.MM.yyyy", ideas.get(position).getDate()).toString());
-        if(curentUserId.equals(ideas.get(position).getUserId())||(adminRoot))
+        if (curentUserId.equals(ideas.get(position).getUserId()) || (adminRoot))
             holder.delete.setVisibility(View.VISIBLE);
         else
             holder.delete.setVisibility(View.GONE);
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mainActivity.deletIdea(ideaID,pos);
+                mainActivity.deletIdea(ideaID, pos);
             }
         });
         holder.date.setText(DateFormat.format("dd.MM.yyyy", ideas.get(position).getDate()).toString());
@@ -118,10 +123,14 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
             });
         }
         List<String> photos = ideas.get(position).getFiles();
+        holder.like.setText(""+ideas.get(position).getLikes());
+        holder.dislike.setText(""+ideas.get(position).getDislikes());
+
+
         holder.author.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mainActivity.search("author",userID,"");
+                mainActivity.search("author", userID, "");
             }
         });
 
@@ -147,7 +156,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
 
             @Override
             public void onErrorResponse(VolleyError error) {
-               // Log.d(TAG, "error avatar load " + error.networkResponse.statusCode);
+                // Log.d(TAG, "error avatar load " + error.networkResponse.statusCode);
             }
         });
         final ImageView imageView = holder.cover;
