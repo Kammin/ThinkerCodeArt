@@ -3,6 +3,9 @@
     <string name="message_text">Text of your message</string>
 
     <string name="ACTIVE_USER">ActiveUser</string>
+    <string name="ACTIVE_USER_ID">ActiveUserId</string>
+    <string name="ACTIVE_EMAIL">ActiveEmail</string>
+    <string name="ACTIVE_ROLES">ActiveRoles</string>
     <string name="AUTH">auth</string>
     <string name="PATH">Path</string>
     <string name="NoConnection">No internet connection. Check the network settings.</string>

@@ -28,6 +28,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.example.kamin.thinkercodeart.R;
 import com.example.kamin.thinkercodeart.util.URLs;
@@ -128,9 +129,6 @@ public class StartActivity extends AppCompatActivity {
         username = etLogin.getText().toString();
         password = etPass.getText().toString();
         loginUser();
-        //String[] params = new String[]{etLogin.getText().toString(), etPass.getText().toString()};
-        //new PostClass(this).execute(params);
-
     }
 
     void onClickSignUp(View v) {
@@ -276,11 +274,6 @@ public class StartActivity extends AppCompatActivity {
     }
 
 
-
-
-
-
-
     void loginUser() {
         JSONObject jsonBody = new JSONObject();
         try {
@@ -291,32 +284,32 @@ public class StartActivity extends AppCompatActivity {
         }
         final String requestBody = jsonBody.toString();
         Log.d(TAG, requestBody);
-        StringRequest jsonReq = new StringRequest(Request.Method.POST,
-                URLs.LOGIN, new com.android.volley.Response.Listener<String>() {
+        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST,
+                URLs.LOGIN,null, new com.android.volley.Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(String response) {
-                Log.d(TAG, "NetworkResponse " + response.toString());
+            public void onResponse(JSONObject response) {
+                Log.d(TAG, "Response: " + response.toString());
+                if (response != null) {
+                    try {
+                        SharedPreferences.Editor ed = sPref.edit();
+                        ed.putString(getResources().getString(R.string.ACTIVE_USER), response.getString("username"));
+                        ed.putString(getResources().getString(R.string.ACTIVE_USER_ID), response.getString("userId"));
+                        ed.putString(getResources().getString(R.string.ACTIVE_EMAIL), response.getString("email"));
+                        ed.putString(getResources().getString(R.string.ACTIVE_ROLES), response.getJSONArray("roles").toString());
+                        ed.commit();
+                        login();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }, new com.android.volley.Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                NetworkResponse networkResponse = error.networkResponse;
-                if (networkResponse != null && networkResponse.statusCode != 200){
-                    Log.d(TAG, "networkResponse.statusCode " + networkResponse.statusCode);
-                    error();
-                }
-                VolleyLog.d(TAG, "Error: " + "  " + error.toString());
+                error();
+                Log.d(TAG, "Error: " + error.getNetworkTimeMs() + "  " + error.toString()+"code "+error.networkResponse.statusCode);
             }
-        }) {
-
-            @Override
-            protected Response<String> parseNetworkResponse(NetworkResponse response) {
-                Log.d(TAG, "NetworkResponse " + response.statusCode);
-                if (response.statusCode == 200) {
-                    login();
-                }
-                return super.parseNetworkResponse(response);
-            }
+        }){
 
             @Override
             public String getBodyContentType() {
@@ -324,7 +317,7 @@ public class StartActivity extends AppCompatActivity {
             }
 
             @Override
-            public byte[] getBody() throws AuthFailureError {
+            public byte[] getBody(){
                 try {
                     return requestBody == null ? null : requestBody.getBytes("utf-8");
                 } catch (UnsupportedEncodingException uee) {

@@ -117,8 +117,6 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
                     imageViewavatar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                         @Override
                         public void onGlobalLayout() {
-                            Log.d(TAG, "imageView.getWidth " + imageViewavatar.getWidth());
-                            Log.d(TAG, "imageView.getHeight " + imageViewavatar.getHeight());
                         }
                     });
                 }
@@ -126,7 +124,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, "error avatar load " + error.networkResponse.statusCode);
+               // Log.d(TAG, "error avatar load " + error.networkResponse.statusCode);
             }
         });
         final ImageView imageView = holder.cover;
