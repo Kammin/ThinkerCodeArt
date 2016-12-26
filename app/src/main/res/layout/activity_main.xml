@@ -52,7 +52,7 @@
         android:tint="@color/colorOrange"
         app:backgroundTint="@color/colorPrimary"
         app:borderWidth="0dp"
-        app:layout_behavior="com.example.kamin.thinkercodeart.util.ScrollingFABBehavior"
+
         />
 
     <RelativeLayout

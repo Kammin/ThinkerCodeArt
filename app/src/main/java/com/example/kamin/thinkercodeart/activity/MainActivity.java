@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +23,7 @@ import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.example.kamin.thinkercodeart.R;
 import com.example.kamin.thinkercodeart.adapter.IdeaAdapter;
 import com.example.kamin.thinkercodeart.model.Idea;
@@ -37,7 +37,6 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,13 +49,12 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences sPref;
     String userName;
     RecyclerView recyclerView;
-    final FragmentManager manager = getSupportFragmentManager();
     MainActivity mainActivity;
     public static final String TAG = MainActivity.class.getSimpleName();
+    boolean canLoad = true;
     String auth;
     LinearLayoutManager linearLayoutManager;
-    private int previousTotal = 0;
-    private boolean loading = true;
+    private String loading;
     private int loadForItem = 10;
     String endIdeaID = "";
     IdeaAdapter ideaAdapter;
@@ -108,7 +106,26 @@ public class MainActivity extends AppCompatActivity {
         linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        if (Singleton.getInstance(this).ideas.size()==0)
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (dy > 0) {
+                    // Scroll Down
+                    if (fab.isShown()) {
+                        fab.hide();
+                    }
+                } else if (dy < 0) {
+                    // Scroll Up
+                    if (!fab.isShown()) {
+                        fab.show();
+                    }
+                }
+            }
+        });
+
+        if (Singleton.getInstance(this).ideas.size() == 0)
             feedIdeas(URLs.IDEAS_PATH, false);
 
 
@@ -119,27 +136,30 @@ public class MainActivity extends AppCompatActivity {
 
                 int totalItemCount = linearLayoutManager.getItemCount();
                 int firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
-/*                if (loading) {
-                    if (totalItemCount > previousTotal) {
-
-                     //   previousTotal = totalItemCount;
-                        Log.d(TAG, "end loading");
+                if ((totalItemCount < firstVisibleItem + loadForItem)&&(canLoad)) {
+                    if (loading.equals(getString(R.string.LoadIdea))) {
+                        canLoad = false;
+                        feedIdeas(URLs.IDEAS + "/part/" + endIdeaID, true);
+                        Log.d(TAG, "loading ----  " + URLs.IDEAS + "/part/" + endIdeaID);
                     }
-                */
-                if (loading && (totalItemCount < firstVisibleItem + loadForItem)) {
-                    loading = false;
-                    feedIdeas(URLs.IDEAS +"/part/"+ endIdeaID, true);
-                    Log.d(TAG, "loading ----  " + URLs.IDEAS + "/part/" + endIdeaID);
+                    if (loading.equals(getString(R.string.LoadSerch))) {
+                        canLoad = false;
+                        feedIdeas(URLs.IDEAS + "/part/" + endIdeaID, true);
+                        Log.d(TAG, "loading ----  " + URLs.IDEAS + "/part/" + endIdeaID);
+                    }
                 }
+
+
             }
         });
     }
 
     void feedIdeas(String URL, boolean add) {
         final boolean thisAdd = add;
+        loading = getResources().getString(R.string.LoadIdea);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        if(!thisAdd)
-        progressBar.setVisibility(View.VISIBLE);
+        if (!thisAdd)
+            progressBar.setVisibility(View.VISIBLE);
         JsonArrayRequest jsonReq = new JsonArrayRequest(Request.Method.GET,
                 URL, null, new com.android.volley.Response.Listener<JSONArray>() {
             @Override
@@ -149,13 +169,12 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "response length = " + response.length());
                     parseJsonFeed(response);
                     if (thisAdd)
-                    ideaAdapter.notifyDataSetChanged();
+                        ideaAdapter.notifyDataSetChanged();
                     else
                         recyclerView.setAdapter(ideaAdapter);
                     Log.d(TAG, "ideas length = " + Singleton.getInstance(getApplicationContext()).ideas.size());
                     progressBar.setVisibility(View.GONE);
-                    Collections.reverse(Singleton.getInstance(getApplicationContext()).ideas);
-                    loading = true;
+
                 }
             }
 
@@ -189,22 +208,24 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject obj = response.getJSONObject(i);
                 Idea idea = new Idea();
                 idea.setIdeaId(obj.getString("ideaId"));
-                if (i == response.length() - 1)
+                if (i == response.length() - 1) {
                     endIdeaID = idea.getIdeaId();
+                    Log.d(TAG, "endIdeaID " + endIdeaID);
+                }
                 idea.setName(obj.getString("name"));
                 idea.setBodyIdea(obj.getString("description"));
                 idea.setUserId(obj.getString("userId"));
                 idea.setUsername(obj.getString("username"));
-
+                Log.d(TAG, "endIdeaID "+ i+" auth "+idea.getUserId()+ " IdeaId " + idea.getIdeaId() );
                 List<String> files = new ArrayList<>();
                 try {
-                JSONArray objFiles = obj.getJSONArray("files");
-                for (int j = 0; j < objFiles.length(); j++) {
-                    String file = objFiles.get(j).toString();
-                    files.add(file);
-                }
+                    JSONArray objFiles = obj.getJSONArray("files");
+                    for (int j = 0; j < objFiles.length(); j++) {
+                        String file = objFiles.get(j).toString();
+                        files.add(file);
+                    }
                 } catch (JSONException e) {
-                    Log.d(TAG, "JSONException "+i+" "+e.getMessage());
+                    Log.d(TAG, "JSONException " + i + " " + e.getMessage());
                     e.printStackTrace();
                 }
                 idea.setFiles(files);
@@ -222,9 +243,9 @@ public class MainActivity extends AppCompatActivity {
                 idea.setUserLikeStatus(obj.getInt("userLikeStatus"));
 
                 Singleton.getInstance(this).ideas.add(idea);
-                Log.d(TAG, "ideas.add "+i+" ");
+                Log.d(TAG, "ideas.add " + Singleton.getInstance(this).ideas.size());
             } catch (JSONException e) {
-                Log.d(TAG, "JSONException "+i+" "+e.getMessage());
+                Log.d(TAG, "JSONException " + i + " " + e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -263,6 +284,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.refresh:
+                Singleton.getInstance(getApplicationContext()).ideas.clear();
+                ideaAdapter.notifyDataSetChanged();
+                recyclerView.invalidate();
                 feedIdeas(URLs.IDEAS_PATH, false);
                 return true;
 
@@ -273,6 +297,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void search(String criteria, String content, String part) {
+        loading = getResources().getString(R.string.LoadSerch);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
         JSONObject jsonBody = new JSONObject();
@@ -285,7 +310,9 @@ public class MainActivity extends AppCompatActivity {
         }
         final String requestBody = jsonBody.toString();
         Log.d(TAG, requestBody);
-
+        Singleton.getInstance(getApplicationContext()).ideas.clear();
+        ideaAdapter.notifyDataSetChanged();
+        recyclerView.invalidate();
         JsonArrayRequest jsonReq = new JsonArrayRequest(Request.Method.POST,
                 URLs.SERCH, null, new com.android.volley.Response.Listener<JSONArray>() {
             @Override
@@ -295,10 +322,10 @@ public class MainActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     Log.d(TAG, "response length = " + response.length());
                     parseJsonFeed(response);
-                    Log.d(TAG, "ideas length = " + Singleton.getInstance(getApplicationContext()).ideas.size());
                     progressBar.setVisibility(View.GONE);
-                    Collections.reverse(Singleton.getInstance(getApplicationContext()).ideas);
-                    recyclerView.setAdapter(new IdeaAdapter(Singleton.getInstance(getApplicationContext()).ideas, R.layout.item_idea, getApplicationContext(), mainActivity));
+                    ideaAdapter.notifyDataSetChanged();
+
+                    canLoad = true;
                 }
             }
         }, new com.android.volley.Response.ErrorListener() {
@@ -329,11 +356,50 @@ public class MainActivity extends AppCompatActivity {
                 headers.put("Authorization", "Basic " + auth);
                 return headers;
             }
+        };
+
+        jsonReq.setRetryPolicy(new DefaultRetryPolicy(20000, 3, DefaultRetryPolicy.DEFAULT_MAX_RETRIES));
+        Singleton.getInstance(this).addToRequestQueue(jsonReq);
+    }
+
+    public void deletIdea(String ideaID, int pos) {
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+        final int position = pos;
+        StringRequest jsonReq = new StringRequest(Request.Method.DELETE,
+                URLs.IDEAS + "/" + ideaID, new com.android.volley.Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, "Response: " + response.toString());
+                if (response != null) {
+                    progressBar.setVisibility(View.GONE);
+                    Singleton.getInstance(getApplicationContext()).ideas.remove(position);
+                    ideaAdapter.notifyDataSetChanged();
+                    Intent intent = new Intent(getApplicationContext(), AlertDialogActivity.class);
+                    intent.putExtra("MESSAGE", getResources().getString(R.string.IdeaDeleted));
+                    startActivity(intent);
+                }
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, "Error Response: " + error.getNetworkTimeMs() + "  " + error.toString());
+                progressBar.setVisibility(View.GONE);
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Authorization", "Basic " + auth);
+                return headers;
+            }
 
         };
 
         jsonReq.setRetryPolicy(new DefaultRetryPolicy(20000, 3, DefaultRetryPolicy.DEFAULT_MAX_RETRIES));
         Singleton.getInstance(this).addToRequestQueue(jsonReq);
     }
+
 
 }

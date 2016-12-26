@@ -1,7 +1,9 @@
 package com.example.kamin.thinkercodeart.adapter;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -30,6 +32,8 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
     private List<Idea> ideas;
     private int rowLayout;
     private Context context;
+    String curentUserId;
+    Boolean adminRoot=false;
     private static final String TAG = IdeaAdapter.class.getSimpleName();
     MainActivity mainActivity;
     public IdeaAdapter(List<Idea> ideas, int rowLayout, Context context, MainActivity mainActivity) {
@@ -37,6 +41,9 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
         this.rowLayout = rowLayout;
         this.context = context;
         this.mainActivity = mainActivity;
+        SharedPreferences sPref = PreferenceManager.getDefaultSharedPreferences(context);
+        curentUserId = sPref.getString(context.getResources().getString(R.string.ACTIVE_USER_ID), "");
+        adminRoot = sPref.getString(context.getResources().getString(R.string.ACTIVE_ROLES), "").contains("ROLE_ADMIN");
     }
 
     public class IdeaViewHolder extends RecyclerView.ViewHolder {
@@ -46,6 +53,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
         TextView bodyIdea;
         TextView author;
         TextView date;
+        TextView delete;
         LinearLayout parentLLforTags;
         ProgressBar progressBarPhoto;
 
@@ -57,6 +65,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
             bodyIdea = (TextView) itemView.findViewById(R.id.bodyIdea);
             author = (TextView) itemView.findViewById(R.id.author);
             date = (TextView) itemView.findViewById(R.id.date);
+            delete = (TextView) itemView.findViewById(R.id.deleteIdea);
             parentLLforTags = (LinearLayout) itemView.findViewById(R.id.parentLLforTags);
             progressBarPhoto = (ProgressBar) itemView.findViewById(R.id.progressBarPhoto);
         }
@@ -72,11 +81,24 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
 
     @Override
     public void onBindViewHolder(IdeaAdapter.IdeaViewHolder holder, int position) {
+        final int pos = position;
+        final String ideaID= ideas.get(position).getIdeaId();
         final String userID =  ideas.get(position).getUserId();
         Log.d(TAG, "onBindViewHolder " + position);
         holder.nameIdea.setText(ideas.get(position).getName());
         holder.bodyIdea.setText(ideas.get(position).getBodyIdea());
         holder.author.setText(ideas.get(position).getUsername());
+        holder.date.setText(DateFormat.format("dd.MM.yyyy", ideas.get(position).getDate()).toString());
+        if(curentUserId.equals(ideas.get(position).getUserId())||(adminRoot))
+            holder.delete.setVisibility(View.VISIBLE);
+        else
+            holder.delete.setVisibility(View.GONE);
+        holder.delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mainActivity.deletIdea(ideaID,pos);
+            }
+        });
         holder.date.setText(DateFormat.format("dd.MM.yyyy", ideas.get(position).getDate()).toString());
         List<String> tags = ideas.get(position).getTags();
         holder.parentLLforTags.removeAllViews();
@@ -85,6 +107,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
             final TextView tvTag = new TextView(context);
             holder.parentLLforTags.addView(tvTag);
             tvTag.setText(tags.get(i));
+            tvTag.setTextSize(16);
             tvTag.setPadding((int) context.getResources().getDimension(R.dimen.tag_padding), 0, 0, 0);
             tvTag.setTextColor(context.getResources().getColor(R.color.colorHashTag));
             tvTag.setOnClickListener(new View.OnClickListener() {

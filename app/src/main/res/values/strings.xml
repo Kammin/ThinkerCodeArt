@@ -15,10 +15,13 @@
     <string name="RegIncorrectConfirmation">Password and confirmation are different.</string>
     <string name="RegSuccessRegister">Congratulations! Data registration was successfully sent to the server. Сheck yoy e-mail and confirm the registration</string>
     <string name="RegFailedRegister">Registration failed. Unfortunately, this login is already in use.</string>
+    <string name="IdeaDeleted">Idea successfully deleted.</string>
     <string name="IdeaAdded">Сongratulations, your idea successfully added.</string>
     <string name="link"><a href="http://thinker-codeart.44fs.preview.openshiftapps.com/">thinker</a> is the service which help you remember your ideas</string>
     <string name="CreateIdea">Create new idea</string>
     <string name="selectPhoto">Select photo</string>
     <string name="ExceedingWeight">Exceeding the maximum weight of the photos.</string>
     <string name="ExceedingCount">Exceeding the maximum count of the photos.</string>
+    <string name="LoadIdea">LOAD_IDEA</string>
+    <string name="LoadSerch">LOAD_SERCH</string>
 </resources>
