@@ -71,9 +71,7 @@ public class IdeaActivity extends AppCompatActivity {
         etName = (EditText) findViewById(R.id.etName);
         etBody = (EditText) findViewById(R.id.etBody);
         etTags = (EditText) findViewById(R.id.etTags);
-        etName.setText("Имя Имя");
-        etBody.setText("тело тело тело");
-        etTags.setText("тег тег");
+
 
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
@@ -113,6 +111,8 @@ public class IdeaActivity extends AppCompatActivity {
             public void onResponse(NetworkResponse response) {
                 Log.d(TAG, "resultResponse networkTimeMs " + response.networkTimeMs + " statusCode " + response.statusCode);
                 if (response.statusCode == 200) {
+                    HolderData.needReload=true;
+                    finish();
                     Intent intent = new Intent(context, AlertDialogActivity.class);
                     intent.putExtra("MESSAGE", getResources().getString(R.string.IdeaAdded));
                     startActivity(intent);

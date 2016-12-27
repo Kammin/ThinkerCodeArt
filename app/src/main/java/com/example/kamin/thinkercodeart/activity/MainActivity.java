@@ -41,6 +41,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.kamin.thinkercodeart.util.URLs.IDEAS_PATH;
+
 public class MainActivity extends AppCompatActivity {
 
     ProgressBar progressBar;
@@ -51,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     MainActivity mainActivity;
     public static final String TAG = MainActivity.class.getSimpleName();
-    boolean canLoad = true;
-    String auth;
+    public boolean canLoad = false;
+    String auth,curentUserID;
     LinearLayoutManager linearLayoutManager;
     private String loading;
     private int loadForItem = 10;
@@ -80,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences sPref = PreferenceManager.getDefaultSharedPreferences(this);
         auth = sPref.getString(getResources().getString(R.string.AUTH), "");
+        curentUserID = sPref.getString(getResources().getString(R.string.ACTIVE_USER_ID), "");
 
         fab = (FloatingActionButton) findViewById(R.id.fabButton);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -127,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         if (Singleton.getInstance(this).ideas.size() == 0)
-            feedIdeas(URLs.IDEAS_PATH, false);
+            feedIdeas(IDEAS_PATH, false);
 
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -138,29 +141,32 @@ public class MainActivity extends AppCompatActivity {
                 int totalItemCount = linearLayoutManager.getItemCount();
                 int firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
                 if ((totalItemCount < firstVisibleItem + loadForItem)&&(canLoad)) {
+                    Log.d(TAG, "loading ---- canLoad " + canLoad);
                     if (loading.equals(getString(R.string.LoadIdea))) {
-                        canLoad = false;
                         feedIdeas(URLs.IDEAS + "/part/" + endIdeaID, true);
                         Log.d(TAG, "loading ----  " + URLs.IDEAS + "/part/" + endIdeaID);
                     }
                     if (loading.equals(getString(R.string.LoadSerch))) {
-                        canLoad = false;
                         search(criteria, content,endIdeaID);
-                        Log.d(TAG, "loading ----  " + URLs.IDEAS + " / " + endIdeaID);
+                        Log.d(TAG, "loading ---- search " +" content "+content+" endIdeaID"+endIdeaID);
                     }
                 }
-
-
             }
         });
     }
 
     void feedIdeas(String URL, boolean add) {
+        canLoad = false;
         final boolean thisAdd = add;
+        Log.d(TAG, "LOAD feed URL" + URL);
         loading = getResources().getString(R.string.LoadIdea);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        if (!thisAdd)
+        if (!thisAdd) {
             progressBar.setVisibility(View.VISIBLE);
+            Singleton.getInstance(getApplicationContext()).ideas.clear();
+            ideaAdapter.notifyDataSetChanged();
+            recyclerView.invalidate();
+        }
         JsonArrayRequest jsonReq = new JsonArrayRequest(Request.Method.GET,
                 URL, null, new com.android.volley.Response.Listener<JSONArray>() {
             @Override
@@ -175,7 +181,6 @@ public class MainActivity extends AppCompatActivity {
                         recyclerView.setAdapter(ideaAdapter);
                     Log.d(TAG, "ideas length = " + Singleton.getInstance(getApplicationContext()).ideas.size());
                     progressBar.setVisibility(View.GONE);
-                    canLoad = true;
                 }
             }
 
@@ -184,6 +189,7 @@ public class MainActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 Log.d(TAG, "Error: " + error.getNetworkTimeMs() + "  " + error.toString());
                 progressBar.setVisibility(View.GONE);
+                canLoad = false;
             }
         });
         jsonReq.setRetryPolicy(new DefaultRetryPolicy(10000, 3, DefaultRetryPolicy.DEFAULT_MAX_RETRIES));
@@ -202,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
      * Parsing json reponse and passing the data to feed view list adapter
      */
     private void parseJsonFeed(JSONArray response) {
-        Log.d(TAG, "array lenght " + response.length());
+        Log.d(TAG, "LOAD array lenght " + response.length());
         for (int i = 0; i < response.length(); i++) {
 
             try {
@@ -211,13 +217,13 @@ public class MainActivity extends AppCompatActivity {
                 idea.setIdeaId(obj.getString("ideaId"));
                 if (i == response.length() - 1) {
                     endIdeaID = idea.getIdeaId();
+                    canLoad = true;
                     Log.d(TAG, "endIdeaID " + endIdeaID);
                 }
                 idea.setName(obj.getString("name"));
                 idea.setBodyIdea(obj.getString("description"));
                 idea.setUserId(obj.getString("userId"));
                 idea.setUsername(obj.getString("username"));
-                Log.d(TAG, "endIdeaID "+ i+" auth "+idea.getUserId()+ " IdeaId " + idea.getIdeaId() );
                 List<String> files = new ArrayList<>();
                 try {
                     JSONArray objFiles = obj.getJSONArray("files");
@@ -269,11 +275,13 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_ideas:
-                feedIdeas(URLs.IDEAS_PATH, false);
+                feedIdeas(IDEAS_PATH, false);
                 return true;
 
             case R.id.action_my_ideas:
-                // feedIdeas();
+                Singleton.getInstance(this).ideas.clear();
+                ideaAdapter.notifyDataSetChanged();
+                search("author",curentUserID,"");
                 return true;
 
             case R.id.action_user:
@@ -288,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
                 Singleton.getInstance(getApplicationContext()).ideas.clear();
                 ideaAdapter.notifyDataSetChanged();
                 recyclerView.invalidate();
-                feedIdeas(URLs.IDEAS_PATH, false);
+                feedIdeas(IDEAS_PATH, false);
                 return true;
 
             default:
@@ -297,9 +305,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        if(HolderData.needReload){
+            HolderData.needReload=false;
+            feedIdeas(IDEAS_PATH, false);
+        }
+        super.onResume();
+    }
+
     public void search(String criteria, String content, String part) {
         this.criteria = criteria;
         this.content = content;
+        canLoad = false;
+        Log.d(TAG, "LOAD search  criteria" + criteria+" content "+content+" part "+part);
         loading = getResources().getString(R.string.LoadSerch);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
@@ -313,27 +332,25 @@ public class MainActivity extends AppCompatActivity {
         }
         final String requestBody = jsonBody.toString();
         Log.d(TAG, requestBody);
-        Singleton.getInstance(getApplicationContext()).ideas.clear();
-        ideaAdapter.notifyDataSetChanged();
         recyclerView.invalidate();
         JsonArrayRequest jsonReq = new JsonArrayRequest(Request.Method.POST,
                 URLs.SERCH, null, new com.android.volley.Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
-                Log.d(TAG, "Response: " + response.toString());
+                Log.d(TAG, "LOAD Response: " + response.toString());
                 if (response != null) {
                     progressBar.setVisibility(View.GONE);
                     Log.d(TAG, "response length = " + response.length());
                     parseJsonFeed(response);
                     progressBar.setVisibility(View.GONE);
                     ideaAdapter.notifyDataSetChanged();
-                    canLoad = true;
                 }
             }
         }, new com.android.volley.Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, "Error: " + error.getNetworkTimeMs() + "  " + error.toString());
+                canLoad = false;
+                Log.d(TAG, "LOAD Error: " + error.getNetworkTimeMs() + "  " + error.toString());
                 progressBar.setVisibility(View.GONE);
             }
         }) {

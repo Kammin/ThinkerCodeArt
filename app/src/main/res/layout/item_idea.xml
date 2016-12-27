@@ -113,7 +113,7 @@
                 android:layout_height="200dp"
                 android:layout_gravity="center_vertical"
                 android:background="@color/colorBorderCard"
-                android:scaleType="centerCrop" />
+                android:scaleType="fitCenter" />
 
             <ProgressBar
                 android:id="@+id/progressBarPhoto"

@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
@@ -26,6 +25,8 @@ import com.example.kamin.thinkercodeart.util.URLs;
 import com.example.kamin.thinkercodeart.volley.Singleton;
 
 import java.util.List;
+
+import static com.example.kamin.thinkercodeart.util.HolderData.curentPhoto;
 
 
 public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder> {
@@ -89,6 +90,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
         final int pos = position;
         final String ideaID = ideas.get(position).getIdeaId();
         final String userID = ideas.get(position).getUserId();
+        final String curentIdeaId = ideas.get(position).getIdeaId();
         Log.d(TAG, "onBindViewHolder " + position);
         holder.nameIdea.setText(ideas.get(position).getName());
         holder.bodyIdea.setText(ideas.get(position).getBodyIdea());
@@ -118,24 +120,29 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
             tvTag.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(context, "" + tvTag.getText(), Toast.LENGTH_SHORT).show();
+                    Singleton.getInstance(context).ideas.clear();
+                    notifyDataSetChanged();
+                    mainActivity.search("tags", tvTag.getText().toString(), "");
                 }
             });
         }
-        List<String> photos = ideas.get(position).getFiles();
-        holder.like.setText(""+ideas.get(position).getLikes());
-        holder.dislike.setText(""+ideas.get(position).getDislikes());
+        final List<String> photos = ideas.get(position).getFiles();
+        holder.like.setText("" + ideas.get(position).getLikes());
+        holder.dislike.setText("" + ideas.get(position).getDislikes());
 
 
         holder.author.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Singleton.getInstance(context).ideas.clear();
+                notifyDataSetChanged();
                 mainActivity.search("author", userID, "");
             }
         });
 
         String avatarURL = URLs.USERS.concat("/" + ideas.get(position).getUserId() + "/avatar");
         final ImageView imageViewavatar = holder.avatar;
+
         ImageLoader.ImageContainer containerAvatar = Singleton.getInstance(context).getImageLoader().get(avatarURL, new ImageLoader.ImageListener() {
             @Override
             public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
@@ -156,7 +163,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                // Log.d(TAG, "error avatar load " + error.networkResponse.statusCode);
+                Log.d(TAG, "error avatar load " + error.networkResponse.statusCode);
             }
         });
         final ImageView imageView = holder.cover;
@@ -164,7 +171,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
             final ProgressBar progressBarPhoto = holder.progressBarPhoto;
             progressBarPhoto.setVisibility(View.VISIBLE);
             final String coverURL = URLs.IDEAS.concat("/" + ideas.get(position).getIdeaId() + "/cover");
-            final ImageLoader.ImageContainer container = Singleton.getInstance(context).getImageLoader().get(coverURL, new ImageLoader.ImageListener() {
+            ImageLoader.ImageContainer container = Singleton.getInstance(context).getImageLoader().get(coverURL, new ImageLoader.ImageListener() {
                 @Override
                 public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
                     Bitmap bitmap = response.getBitmap();
@@ -179,10 +186,47 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.IdeaViewHolder
                 public void onErrorResponse(VolleyError error) {
                     progressBarPhoto.setVisibility(View.GONE);
                     Log.d(TAG, "ErrorResponse " + coverURL);
-
                 }
             });
         }
+        if (photos.size() > 1) {
+            curentPhoto = 0;
+            Log.d(TAG,"photos "+photos.toString());
+            final ProgressBar progressBarPhoto = holder.progressBarPhoto;
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (curentPhoto  < photos.size()-1) {
+                        curentPhoto += 1;
+                    } else
+                        curentPhoto = 0;
+                    progressBarPhoto.setVisibility(View.VISIBLE);
+                    String name = photos.get(curentPhoto).subSequence(0,photos.get(curentPhoto).lastIndexOf(".")).toString();
+                    String ext = photos.get(curentPhoto).subSequence(photos.get(curentPhoto).lastIndexOf(".")+1,photos.get(curentPhoto).length()).toString();
+                    String URLphoto = URLs.IDEAS+"/"+curentIdeaId+"/"+name+"/"+ext;
+                    Log.d(TAG,"photos "+URLphoto);
+                    ImageLoader.ImageContainer container = Singleton.getInstance(context).getImageLoader().get(URLphoto, new ImageLoader.ImageListener() {
+                        @Override
+                        public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
+                            Bitmap bitmap = response.getBitmap();
+                            if (bitmap != null) {
+                                Log.d(TAG,"photos "+photos.get(curentPhoto));
+                                imageView.setImageBitmap(bitmap);
+                                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                progressBarPhoto.setVisibility(View.GONE);
+                            }
+                        }
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            progressBarPhoto.setVisibility(View.GONE);
+                            Log.d(TAG, "ErrorResponse " + photos.get(curentPhoto));
+
+                        }
+                    });
+                }
+            });
+        }
+
 
     }
 

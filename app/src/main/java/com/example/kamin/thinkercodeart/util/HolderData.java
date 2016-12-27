@@ -10,6 +10,8 @@ public class HolderData {
 
     public static final int MaxWeithPhotoArray = 10485760;
     public static final int MaxPhotoCount = 6;
+    public static  boolean needReload;
+    public static  int curentPhoto;
 
 
 }
